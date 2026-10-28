@@ -1,0 +1,6 @@
+node_modules/
+.next/
+.env*
+# Waitlist sign-ups are personal data; never commit them.
+data/
+.DS_Store
