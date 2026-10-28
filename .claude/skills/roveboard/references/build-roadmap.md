@@ -25,7 +25,8 @@
 - Covered steps: 1 (create trip), 2 (manual add; paste-email keeps the text as notes), 3 (status and notes), 5 (dashboard), 6 (deadlines and mark paid, no emails), 7 (edit trip and supplier), 8 (directory reuse copies contact details only).
 - Not yet covered: step 4's real AI review screen with source highlighting, the Today view, a "next action" column, reminders, and the itinerary and documents tabs (honest placeholders).
 - `public/images/`: real Unsplash photos (2026-10-28), replacing the earlier crops from the mockup. Sources are in `IMAGE-CREDITS.md`.
-- No git repo, automated tests, backend or real waitlist yet. A click-through check was run with headless Chrome over the DevTools protocol (22 checks); the script isn't in the repo.
+- **Git:** pushed to GitHub at `ChisomUma/roveboard` (branch `main`, remote over SSH host alias `github-second`) on 2026-10-28. It was **public** at first; recommend private, because `.claude/` holds strategy docs. Commit or push only when the founder asks.
+- No automated tests in the repo, no backend, and no online waitlist yet. A click-through check was run with headless Chrome over the DevTools protocol (22 checks); the script isn't in the repo.
 
 ## Stage 1: interactive prototype (now)
 Goal: a clickable, realistic product that operators can try in a 20-minute call. It uses sample data, needs no accounts and is free to host.
