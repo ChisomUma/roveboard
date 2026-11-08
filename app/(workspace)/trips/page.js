@@ -5,14 +5,22 @@ import { useStore } from '../store';
 import { Empty, Icon, PageHead, TripForm, fmtDate, fmtRange, money, nextPayment, tripMoney, tripStats } from '../ui';
 
 export default function TripsPage() {
-  const { trips } = useStore();
+  const { trips, removeSampleTrips } = useStore();
   const [creating, setCreating] = useState(false);
+  const sampleCount = trips.filter(t => t.isSample).length; // only workspaces created while samples were seeded
   const create = <button className="ws-btn primary" onClick={() => setCreating(true)}><Icon name="plus" size={16} />Create trip</button>;
 
   return (
     <>
       <PageHead title="Trips" sub={<p className="ws-sub">Everything you’re planning, in one place.</p>} actions={create} />
       <div className="ws-body">
+        {sampleCount > 0 && (
+          <div className="ws-sample-bar">
+            <Icon name="info" size={18} />
+            <span><b>{sampleCount === 1 ? 'This is a sample trip' : `These ${sampleCount} trips are samples`}</b> to show you how Roveboard works. Explore and edit freely, then remove them when you’re ready to add your own.</span>
+            <button className="ws-btn small" onClick={() => confirm('Remove the sample trips and their suppliers?') && removeSampleTrips()}>Remove sample trips</button>
+          </div>
+        )}
         {trips.length ? (
           <div className="ws-cards">
             {trips.map(t => {
@@ -20,8 +28,9 @@ export default function TripsPage() {
               const next = nextPayment(t);
               const owed = tripMoney(t).owed;
               return (
-                <Link key={t.id} href={`/trips/${t.id}`} className="ws-card">
-                  <small className="ws-eyebrow">Group trip</small>
+                <Link key={t.id} href={`/trips/${t.id}`} className={'ws-card' + (t.cover ? ' has-cover' : '')}>
+                  {t.cover && <img className="ws-card-cover" src={t.cover} alt="" />}
+                  <small className="ws-eyebrow">{t.isSample ? 'Sample trip' : 'Group trip'}</small>
                   <h2>{t.name}</h2>
                   <p className="ws-meta">{fmtRange(t.start, t.end)}<i />{t.travellers} travellers</p>
                   <div className="ws-progress"><span style={{ width: `${s.suppliers ? (s.confirmed / s.suppliers) * 100 : 0}%` }} /></div>

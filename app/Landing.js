@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Icon, Logo } from './components/icons';
 import { sampleImage } from './components/images';
 import WaitlistForm from './WaitlistForm';
+import SiteNav from './components/SiteNav';
 import { site } from './site';
 
 const sideNav = [['globe', 'Trips'], ['users', 'Suppliers'], ['file', 'Documents'], ['calendar', 'Deadlines'], ['note', 'Notes']];
@@ -28,11 +29,11 @@ const steps = [
 const faqs = [
   ['Do my suppliers need an account?', 'No. Hotels, coach companies and guides never need to sign up or pay. You keep talking to them by email or WhatsApp as you do today, and record what they confirm in Roveboard.'],
   ['Does Roveboard handle payments?', 'No. Roveboard tracks deposits and final balances, and when they’re due, so nothing is missed. You pay suppliers your usual way and mark the payment as paid. Roveboard never holds or moves your money.'],
-  ['Is my data safe?', 'Today’s demo keeps everything in your own browser; nothing you type is sent to us. When early access opens, each company’s data will be private to its own team, and you’ll be able to export it at any time.'],
+  ['Is my data safe?', 'Each company’s trips and suppliers are private to that company. Security rules in the database itself stop anyone else from seeing them, and your data is stored with established cloud providers. Exporting your data is on our roadmap.'],
   ['Can I bring in my spreadsheet?', 'Yes. You can import suppliers from a CSV file, or copy cells straight from Excel or Google Sheets and paste them in. Roveboard matches your columns and shows a preview before anything is added.'],
   ['Does the AI read my emails?', 'Only what you choose to paste or upload. AI suggestions are an early access concept: Roveboard will suggest details from a supplier email or contract, and nothing is saved until you’ve reviewed and confirmed it.'],
-  ['How much will it cost?', 'We’re setting pricing with our first users. It will be a monthly subscription paid by the travel company. Suppliers never pay.'],
-  ['When can I start?', 'You can try the demo right now. Early access opens to a small group first; join the waitlist below to be one of them.'],
+  ['How much will it cost?', 'Plans start at £29 a month billed yearly, priced by how many trips you run, with a 20-day free trial and no credit card needed. See our Pricing page for details. Suppliers never pay.'],
+  ['When can I start?', 'Right now. Create a free account and start adding your trips and suppliers. Some features, like AI suggestions and reminders, are still coming, and you can sign up for updates at the bottom of this page.'],
 ];
 
 const suggestedFields = [
@@ -62,7 +63,7 @@ function AppPreview() {
               <h2>Italy Explorer 2027</h2>
               <p className="lp-meta">12 – 20 Sep 2027<i />24 travellers</p>
             </div>
-            <Link className="lp-padd" href="/dashboard">Add supplier <Icon name="plus" size={16} /></Link>
+            <Link className="lp-padd" href="/login?mode=signup">Add supplier <Icon name="plus" size={16} /></Link>
           </div>
           <div className="lp-tabs">
             {tabs.map((t, i) => <span key={t} className={i ? '' : 'on'}>{t}</span>)}
@@ -149,18 +150,12 @@ export default function Landing() {
   return (
     <div className="lp">
       <header className="lp-hero">
-        <nav className="lp-wrap lp-nav">
-          <Logo />
-          <div>
-            <Link className="lp-login" href="/dashboard">Try the demo</Link>
-            <a className="lp-btn lp-btn-sm" href="#early">Join the waitlist</a>
-          </div>
-        </nav>
+        <SiteNav />
         <div className="lp-wrap lp-hero-copy">
           <h1>The calm behind<br />every great trip.</h1>
           <p className="lp-lead">Keep supplier confirmations, contracts, deposits and deadlines together in one workspace.</p>
           <p className="lp-audience">Built for tour operators, DMCs, travel agencies and wholesalers.</p>
-          <a className="lp-btn" href="#early">Join the waitlist <Icon name="arrow" /></a>
+          <Link className="lp-btn" href="/login?mode=signup">Get started free <Icon name="arrow" /></Link>
         </div>
       </header>
 
@@ -227,7 +222,7 @@ export default function Landing() {
                   <span className="lp-edit"><Icon name="pencil" size={16} />Edit</span>
                 </div>
               ))}
-              <Link className="lp-btn" href="/dashboard">Review details <Icon name="arrow" /></Link>
+              <Link className="lp-btn" href="/login?mode=signup">Review details <Icon name="arrow" /></Link>
             </div>
           </div>
           <p className="lp-note"><Icon name="info" size={18} />This is a proposed early access concept. You’ll always review and confirm the details before adding them to your trip. No automatic booking.</p>
@@ -251,7 +246,7 @@ export default function Landing() {
           <blockquote>
             <p>Group trips run on dozens of supplier conversations: a hotel deposit buried in one email thread, a coach confirmation on WhatsApp, a guide’s invoice in a PDF. When one detail slips, the whole trip feels it.</p>
             <p>I’m building Roveboard to give coordinators one calm place to see what’s confirmed, what’s owed and what’s next, without changing how they talk to their suppliers.</p>
-            <p>Roveboard is in early access. If you coordinate group trips, I’d love to learn how you work today. Join the waitlist and I’ll be in touch.</p>
+            <p>Roveboard is in early access. If you coordinate group trips, I’d love to learn how you work today. Create a free account and tell me what you think.</p>
           </blockquote>
           <p className="lp-founder-sign"><b>{site.founderName}</b>Founder, {site.name}</p>
         </div>
@@ -272,11 +267,15 @@ export default function Landing() {
         </div>
       </section>
 
-      <section className="lp-closing" id="early">
+      <section className="lp-closing" id="get-started">
         <div className="lp-wrap">
           <h2>A calmer way<br />to plan what’s next.</h2>
-          <p>Be the first to experience Roveboard and get early access when we launch.</p>
-          <WaitlistForm />
+          <p>Create your free account and set up your first trip today.</p>
+          <Link className="lp-btn" href="/login?mode=signup">Get started free <Icon name="arrow" /></Link>
+          <div className="lp-updates">
+            <p className="lp-updates-title">Not ready yet? Get product updates by email.</p>
+            <WaitlistForm />
+          </div>
         </div>
       </section>
 
@@ -284,7 +283,9 @@ export default function Landing() {
         <div className="lp-wrap lp-foot-inner">
           <Logo />
           <nav aria-label="Footer">
-            <Link href="/dashboard">Try the demo</Link>
+            <Link href="/login?mode=signup">Sign up</Link>
+            <Link href="/pricing">Pricing</Link>
+            <Link href="/login">Log in</Link>
             <a href="#faq">FAQ</a>
             <Link href="/privacy">Privacy Policy</Link>
             <Link href="/terms">Terms</Link>

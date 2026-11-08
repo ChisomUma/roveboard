@@ -1,104 +1,152 @@
 'use client';
-import { createContext, useContext, useEffect, useState } from 'react';
-import { clearFiles, deleteFile } from './files';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { createClient } from '../lib/supabase/client';
 
-// Stage 1 prototype: everything lives in this browser's localStorage.
-// Stage 2 replaces this provider with Supabase (see the roadmap in the roveboard skill).
-const KEY = 'roveboard-demo-v2';
+// The workspace store: the signed-in company's trips and suppliers, loaded from and saved to Supabase.
+// Row Level Security in the database keeps each company's data private.
 
-const pay = (amount, due, paid = false) => ({ amount, due, paid });
-
-const seed = {
-  notes: '',
-  trips: [
-    {
-      id: 'italy-explorer-2027',
-      name: 'Italy Explorer 2027',
-      start: '2027-09-12',
-      end: '2027-09-20',
-      travellers: 24,
-      currency: 'EUR',
-      suppliers: [
-        { id: 's1', name: 'Hotel Bella Vista', place: 'Rome', category: 'Hotel', status: 'Confirmed', contact: 'reservations@bellavista.it', notes: '10 rooms · 12–15 Sep (3 nights)', img: 'thumb-bella-vista', deposit: pay(1440, '2027-04-30', true), balance: pay(3360, '2027-08-01') },
-        { id: 's2', name: 'Grand Hotel Miramare', place: 'Sorrento', category: 'Hotel', status: 'Confirmed', contact: 'groups@miramare.it', notes: '12 rooms · 15–20 Sep (5 nights)', img: 'thumb-miramare', deposit: pay(1800, '2027-03-15', true), balance: pay(4200, '2027-07-15') },
-        { id: 's3', name: 'Alpine Coaches', place: 'Group transport', category: 'Transport', status: 'Pending', contact: 'bookings@alpinecoaches.it', notes: 'Airport transfers and day trips. Waiting on the pickup quote.', img: 'thumb-alpine-coaches', deposit: pay(600, '2027-04-30'), balance: pay(1400, '2027-08-01') },
-        { id: 's4', name: 'Luigi’s Local Guides', place: 'Amalfi Coast', category: 'Guide', status: 'Confirmed', contact: '+39 333 123 4567', notes: 'Full-day coastal walk, 16 Sep', img: 'thumb-luigis-guides', deposit: pay(300, '2027-02-01', true), balance: pay(700, '2027-06-01', true) },
-        { id: 's5', name: 'Pompeii Archaeological Tours', place: 'Pompeii', category: 'Guide', status: 'Pending', contact: 'info@pompeiitours.it', notes: 'Morning tour, 18 Sep. Confirm group size.', img: 'thumb-pompeii', deposit: pay(240, '2027-05-15'), balance: pay(560, '2027-08-15') },
-        { id: 's6', name: 'La Piazza Restaurant', place: 'Rome', category: 'Restaurant', status: 'Confirmed', contact: 'eventi@lapiazza.it', notes: 'Welcome dinner, 12 Sep. Confirm final numbers 2 weeks before.', deposit: pay(400, '2027-06-01', true), balance: pay(900, '2027-09-01') },
-        { id: 's7', name: 'Blue Sea Boat Tours', place: 'Positano', category: 'Activity', status: 'Confirmed', contact: 'hello@blueseatours.it', notes: 'Private boat, 17 Sep', deposit: pay(500, '2027-05-01', true), balance: pay(1100, '2027-08-01') },
-        { id: 's8', name: 'Vesuvio Wine Estate', place: 'Naples', category: 'Activity', status: 'Confirmed', contact: 'visite@vesuviowine.it', notes: 'Tasting and lunch, 19 Sep', deposit: null, balance: pay(720, '2027-09-01') },
-      ],
-    },
-    {
-      id: 'lisbon-porto-2027',
-      name: 'Lisbon & Porto Discovery',
-      start: '2027-10-04',
-      end: '2027-10-10',
-      travellers: 18,
-      currency: 'EUR',
-      suppliers: [
-        { id: 's9', name: 'Hotel Ribeira', place: 'Porto', category: 'Hotel', status: 'Pending', contact: 'reservas@hotelribeira.pt', notes: '9 rooms · 7–10 Oct', deposit: pay(1200, '2027-05-20'), balance: pay(2800, '2027-09-04') },
-        { id: 's10', name: 'Douro Valley Cruises', place: 'Porto', category: 'Activity', status: 'Confirmed', contact: 'groups@dourocruises.pt', notes: 'Day cruise, 8 Oct', deposit: pay(350, '2027-04-01', true), balance: pay(650, '2027-09-01') },
-      ],
-    },
-  ],
-};
-
-export const newId = () => Math.random().toString(36).slice(2, 10);
+// UUIDs, so ids can be created in the browser and used directly in the database.
+export const newId = () => crypto.randomUUID();
 
 const StoreContext = createContext(null);
 export const useStore = () => useContext(StoreContext);
 
-export function StoreProvider({ children }) {
-  const [data, setData] = useState(seed);
-  const [ready, setReady] = useState(false);
-  const [saveFailed, setSaveFailed] = useState(false);
+export function StoreProvider({ session, children }) {
+  return <LiveStoreProvider session={session}>{children}</LiveStoreProvider>;
+}
 
-  useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem(KEY));
-      if (saved && Array.isArray(saved.trips)) setData(saved);
-    } catch {}
-    setReady(true);
-  }, []);
-
-  useEffect(() => {
-    if (!ready) return;
-    // Usually fails only when browser storage is full (e.g. too many photos); Shell shows a warning.
-    try {
-      localStorage.setItem(KEY, JSON.stringify(data));
-      setSaveFailed(false);
-    } catch {
-      setSaveFailed(true);
-    }
-  }, [data, ready]);
-
+// How each action changes what's on screen; the live store then saves it.
+function stateActions(setData) {
   const setTrips = fn => setData(d => ({ ...d, trips: fn(d.trips) }));
-  const updateTrip = (id, fn) => setTrips(ts => ts.map(t => (t.id === id ? fn(t) : t)));
-  const updateSuppliers = (tripId, fn) => updateTrip(tripId, t => ({ ...t, suppliers: fn(t.suppliers) }));
-
-  const actions = {
+  const updateSuppliers = (tripId, fn) => setTrips(ts => ts.map(t => (t.id === tripId ? { ...t, suppliers: fn(t.suppliers) } : t)));
+  return {
     saveTrip: trip => setTrips(ts => (ts.some(t => t.id === trip.id)
       ? ts.map(t => (t.id === trip.id ? { ...t, ...trip } : t))
       : [...ts, { suppliers: [], ...trip }])),
-    deleteTrip: id => {
-      const trip = data.trips.find(t => t.id === id);
-      trip?.suppliers.forEach(s => (s.documents || []).forEach(d => deleteFile(d.id)));
-      setTrips(ts => ts.filter(t => t.id !== id));
-    },
+    deleteTrip: id => setTrips(ts => ts.filter(t => t.id !== id)),
     saveSupplier: (tripId, s) => updateSuppliers(tripId, list => (list.some(x => x.id === s.id)
       ? list.map(x => (x.id === s.id ? s : x))
       : [...list, s])),
     addSuppliers: (tripId, list) => updateSuppliers(tripId, existing => [...existing, ...list]),
-    deleteSupplier: (tripId, id) => {
-      const supplier = data.trips.find(t => t.id === tripId)?.suppliers.find(x => x.id === id);
-      (supplier?.documents || []).forEach(d => deleteFile(d.id));
-      updateSuppliers(tripId, list => list.filter(x => x.id !== id));
-    },
+    deleteSupplier: (tripId, id) => updateSuppliers(tripId, list => list.filter(x => x.id !== id)),
     setPaid: (tripId, id, kind, paid) => updateSuppliers(tripId, list => list.map(x => (x.id === id ? { ...x, [kind]: { ...x[kind], paid } } : x))),
     setNotes: notes => setData(d => ({ ...d, notes })),
-    resetDemo: () => { clearFiles(); setData(seed); },
+  };
+}
+
+/* ---------- live store (Supabase) ---------- */
+
+const toAmount = p => (p && p.amount !== '' && p.amount != null ? Number(p.amount) : null);
+const toPayment = (amount, due, paid) => (amount == null && !due ? null : { amount: amount == null ? '' : Number(amount), due: due || '', paid });
+
+const supplierFromRow = r => ({
+  id: r.id, name: r.name, category: r.category, place: r.place || '', status: r.status,
+  contact: r.contact || '', notes: r.notes || '', photo: r.photo || null,
+  deposit: toPayment(r.deposit_amount, r.deposit_due, r.deposit_paid),
+  balance: toPayment(r.balance_amount, r.balance_due, r.balance_paid),
+});
+
+export const supplierToRow = (orgId, tripId, s) => ({
+  id: s.id, org_id: orgId, trip_id: tripId, name: s.name.trim(), category: s.category,
+  place: s.place || null, status: s.status, contact: s.contact || null, notes: s.notes || null, photo: s.photo || null,
+  deposit_amount: toAmount(s.deposit), deposit_due: s.deposit?.due || null, deposit_paid: !!s.deposit?.paid,
+  balance_amount: toAmount(s.balance), balance_due: s.balance?.due || null, balance_paid: !!s.balance?.paid,
+});
+
+const tripFromRow = (r, supplierRows) => ({
+  id: r.id, name: r.name, start: r.start_date || '', end: r.end_date || '', travellers: r.travellers ?? '', currency: r.currency, isSample: !!r.is_sample, cover: r.cover || null,
+  suppliers: supplierRows.filter(s => s.trip_id === r.id).map(supplierFromRow),
+});
+
+export const tripToRow = (orgId, t) => ({
+  id: t.id, org_id: orgId, name: t.name.trim(), start_date: t.start || null, end_date: t.end || null,
+  travellers: Number(t.travellers) || null, currency: t.currency || 'EUR', cover: t.cover || null,
+});
+
+function LiveStoreProvider({ session, children }) {
+  const supabase = useMemo(() => createClient(), []);
+  const orgId = session.org.id;
+  const [data, setData] = useState({ trips: [], notes: session.org.notes || '' });
+  const [ready, setReady] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const notesTimer = useRef(null);
+
+  const load = useCallback(async () => {
+    const [trips, suppliers] = await Promise.all([
+      supabase.from('trips').select('*').order('start_date', { nullsFirst: false }).order('created_at'),
+      supabase.from('suppliers').select('*').order('created_at'),
+    ]);
+    if (trips.error || suppliers.error) {
+      console.error('Load failed:', trips.error || suppliers.error);
+      setSaveError('We couldn’t load your workspace. Check your connection and refresh the page.');
+    } else {
+      setData(d => ({ ...d, trips: trips.data.map(r => tripFromRow(r, suppliers.data)) }));
+    }
+    setReady(true);
+  }, [supabase]);
+
+  useEffect(() => { load(); }, [load]);
+
+  // Changes appear on screen straight away and save in the background.
+  // If a save fails, we reload the real data from the database and say so.
+  // Confirmation pop-ups ("toasts"), shown only once the database has confirmed the save.
+  const [toasts, setToasts] = useState([]);
+  const notify = useCallback(message => {
+    const id = newId();
+    setToasts(list => [...list.slice(-2), { id, message }]);
+    setTimeout(() => setToasts(list => list.filter(t => t.id !== id)), 3200);
+  }, []);
+
+  const save = async (query, success) => {
+    const { error } = await query;
+    if (!error) {
+      if (success) notify(success);
+      return;
+    }
+    console.error('Save failed:', error);
+    setSaveError('A change couldn’t be saved, so we reloaded your latest data. Please try again.');
+    load();
   };
 
-  return <StoreContext.Provider value={{ ...data, ready, saveFailed, ...actions }}>{children}</StoreContext.Provider>;
+  // Says what actually changed, e.g. "Cover photo saved" rather than a generic "Trip saved".
+  const photoMessage = (label, before, after, fallback) => {
+    if ((before || null) === (after || null)) return fallback;
+    return after ? `${label} saved` : `${label} removed`;
+  };
+
+  const local = stateActions(setData);
+  const actions = {
+    saveTrip: trip => {
+      const before = data.trips.find(t => t.id === trip.id);
+      local.saveTrip(trip);
+      save(supabase.from('trips').upsert(tripToRow(orgId, trip)), before ? photoMessage('Cover photo', before.cover, trip.cover, 'Trip saved') : 'Trip created');
+    },
+    deleteTrip: id => { local.deleteTrip(id); save(supabase.from('trips').delete().eq('id', id), 'Trip deleted'); },
+    removeSampleTrips: () => {
+      setData(d => ({ ...d, trips: d.trips.filter(t => !t.isSample) }));
+      save(supabase.from('trips').delete().eq('is_sample', true), 'Sample trips removed');
+    },
+    saveSupplier: (tripId, s) => {
+      const before = data.trips.find(t => t.id === tripId)?.suppliers.find(x => x.id === s.id);
+      local.saveSupplier(tripId, s);
+      save(supabase.from('suppliers').upsert(supplierToRow(orgId, tripId, s)), before ? photoMessage('Photo', before.photo, s.photo, 'Supplier saved') : 'Supplier added');
+    },
+    addSuppliers: (tripId, list) => { local.addSuppliers(tripId, list); save(supabase.from('suppliers').insert(list.map(s => supplierToRow(orgId, tripId, s)))); },
+    deleteSupplier: (tripId, id) => { local.deleteSupplier(tripId, id); save(supabase.from('suppliers').delete().eq('id', id), 'Supplier removed'); },
+    setPaid: (tripId, id, kind, paid) => {
+      local.setPaid(tripId, id, kind, paid);
+      save(supabase.from('suppliers').update({ [kind === 'deposit' ? 'deposit_paid' : 'balance_paid']: paid }).eq('id', id), paid ? 'Marked as paid' : 'Marked as unpaid');
+    },
+    setNotes: notes => {
+      local.setNotes(notes);
+      clearTimeout(notesTimer.current); // save once typing pauses
+      notesTimer.current = setTimeout(() => save(supabase.from('organizations').update({ notes }).eq('id', orgId)), 600);
+    },
+  };
+
+  return (
+    <StoreContext.Provider value={{ ...data, session, ready, saveError, clearSaveError: () => setSaveError(''), toasts, ...actions }}>
+      {children}
+    </StoreContext.Provider>
+  );
 }

@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Icon, Logo } from '../components/icons';
 import { sampleImage } from '../components/images';
 import { newId, useStore } from './store';
+import { createClient } from '../lib/supabase/client';
 import { DocumentField, checkDocument } from './documents';
 import { deleteFile, saveFile } from './files';
 
@@ -160,20 +161,26 @@ export function SupplierAvatar({ s }) {
 }
 
 // Crops any image to a small square JPEG so photos stay tiny in browser storage (~10 KB each).
-async function makeThumbnail(file, size = 160) {
+// Crops an image to width × height (centred) and returns a JPEG data URL, so stored images stay small.
+async function resizeImage(file, width, height, quality = 0.82) {
   const bitmap = await createImageBitmap(file);
-  const scale = Math.max(size / bitmap.width, size / bitmap.height);
+  const scale = Math.max(width / bitmap.width, height / bitmap.height);
   const w = bitmap.width * scale;
   const h = bitmap.height * scale;
   const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = size;
+  canvas.width = width;
+  canvas.height = height;
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = '#fff'; // transparent logos would otherwise turn black as JPEG
-  ctx.fillRect(0, 0, size, size);
-  ctx.drawImage(bitmap, (size - w) / 2, (size - h) / 2, w, h);
+  ctx.fillRect(0, 0, width, height);
+  ctx.drawImage(bitmap, (width - w) / 2, (height - h) / 2, w, h);
   bitmap.close?.();
-  return canvas.toDataURL('image/jpeg', 0.82);
+  return canvas.toDataURL('image/jpeg', quality);
 }
+
+// Supplier photo: small square (~12 KB). Trip cover: wide banner, sharp on the cards (~40–60 KB).
+const makeThumbnail = file => resizeImage(file, 160, 160);
+const makeCover = file => resizeImage(file, 720, 300, 0.72);
 
 export function SupplierName({ s, sub }) {
   return (
@@ -255,8 +262,14 @@ const nav = [['/trips', 'globe', 'Trips'], ['/suppliers', 'users', 'Suppliers'],
 
 export function Shell({ children }) {
   const path = usePathname();
-  const { ready, saveFailed, resetDemo } = useStore();
+  const { ready, session, saveError, clearSaveError, toasts } = useStore();
   const active = href => path.startsWith(href) || (href === '/trips' && path === '/dashboard');
+
+  async function logOut() {
+    await createClient().auth.signOut();
+    window.location.href = '/';
+  }
+
   return (
     <div className="ws">
       <aside className="ws-side">
@@ -269,17 +282,41 @@ export function Shell({ children }) {
           ))}
         </nav>
         <div className="ws-side-foot">
-          <b>Demo workspace</b>
-          <span>Saved in this browser only</span>
-          <button onClick={() => confirm('Reset the demo? Your changes will be replaced with the sample trips.') && resetDemo()}>Reset sample data</button>
+          <b>{session.org.name}</b>
+          <span className="ws-side-email">{session.user.email}</span>
+          <button onClick={logOut}>Log out</button>
           <Link href="/">← Back to website</Link>
         </div>
       </aside>
       <main className="ws-main">
-        {saveFailed && <p className="ws-banner" role="alert"><Icon name="alert" size={18} />Your latest changes couldn’t be saved because this browser’s storage is full. Remove some supplier photos, or reset the sample data.</p>}
+        <TrialBanner billing={session.billing} />
+        {saveError && (
+          <p className="ws-banner" role="alert"><Icon name="alert" size={18} />{saveError}<button className="ws-banner-close" onClick={clearSaveError} aria-label="Dismiss">×</button></p>
+        )}
         {ready ? children : null}
       </main>
+      <div className="ws-toasts" role="status" aria-live="polite">
+        {toasts.map(t => <p key={t.id} className="ws-toast"><Icon name="checkFilled" size={18} />{t.message}</p>)}
+      </div>
     </div>
+  );
+}
+
+// Trial countdown / billing notices at the top of every workspace page.
+function TrialBanner({ billing }) {
+  if (!billing) return null;
+  if (billing.status === 'past_due') {
+    return <p className="ws-trial is-warn"><Icon name="alert" size={16} />Your last payment didn’t go through. Please update your card to keep your workspace active.</p>;
+  }
+  if (billing.status !== 'trialing') return null;
+  if (billing.trialOver) {
+    return <p className="ws-trial is-warn"><Icon name="info" size={16} />Your free trial has ended. We’ll be in touch to help you choose a plan.<Link href="/pricing">See plans</Link></p>;
+  }
+  const days = billing.daysLeft;
+  return (
+    <p className={'ws-trial' + (days <= 5 ? ' is-warn' : '')}>
+      <Icon name="calendar" size={16} />{days === 1 ? '1 day' : `${days} days`} left in your free trial.<Link href="/pricing">See plans</Link>
+    </p>
   );
 }
 
@@ -375,9 +412,32 @@ export function DeadlineSections({ trips, showTrip }) {
 export function TripForm({ trip, onClose }) {
   const { saveTrip, deleteTrip } = useStore();
   const router = useRouter();
-  const [f, setF] = useState(trip || { name: '', start: '', end: '', travellers: '', currency: 'EUR' });
+  const [f, setF] = useState(trip || { name: '', start: '', end: '', travellers: '', currency: 'EUR', cover: null });
   const set = k => e => setF({ ...f, [k]: e.target.value });
   const badDates = f.start && f.end && f.end < f.start;
+  const coverInput = useRef(null);
+  const [coverDrag, setCoverDrag] = useState(false);
+  const [coverError, setCoverError] = useState('');
+
+  async function addCover(file) {
+    setCoverError('');
+    if (!file) return;
+    if (!file.type.startsWith('image/')) return setCoverError('Please choose an image file (JPG or PNG).');
+    try {
+      const cover = await makeCover(file);
+      setF(prev => ({ ...prev, cover }));
+    } catch {
+      setCoverError('Couldn’t read that image. Try a JPG or PNG.');
+    }
+  }
+
+  // Pasting an image anywhere in the form (e.g. a destination photo) sets the cover.
+  function onPaste(e) {
+    const file = [...e.clipboardData.files].find(x => x.type.startsWith('image/'));
+    if (!file) return;
+    e.preventDefault();
+    addCover(file);
+  }
 
   function submit(e) {
     e.preventDefault();
@@ -396,7 +456,29 @@ export function TripForm({ trip, onClose }) {
 
   return (
     <Modal title={trip ? 'Edit trip' : 'Create a trip'} sub={trip ? 'Update dates or group size when plans change.' : 'Start with the essentials. You’ll add suppliers next.'} onClose={onClose}>
-      <form className="ws-form" onSubmit={submit}>
+      <form className="ws-form" onSubmit={submit} onPaste={onPaste}>
+        <div
+          className={'ws-cover-field span2' + (coverDrag ? ' is-drag' : '') + (f.cover ? ' has-cover' : '')}
+          onDragOver={e => { e.preventDefault(); setCoverDrag(true); }}
+          onDragLeave={() => setCoverDrag(false)}
+          onDrop={e => { e.preventDefault(); setCoverDrag(false); addCover(e.dataTransfer.files[0]); }}
+        >
+          {f.cover ? <img src={f.cover} alt="" /> : (
+            <button type="button" className="ws-cover-empty" onClick={() => coverInput.current.click()}>
+              <Icon name="upload" size={22} />
+              <b>Add a cover photo <span>(optional)</span></b>
+              <small>Shown on the trip card. Click, drop or paste an image.</small>
+            </button>
+          )}
+          {f.cover && (
+            <div className="ws-cover-actions">
+              <button type="button" className="ws-btn small" onClick={() => coverInput.current.click()}>Change</button>
+              <button type="button" className="ws-btn small" onClick={() => setF({ ...f, cover: null })}>Remove</button>
+            </div>
+          )}
+          <input ref={coverInput} type="file" accept="image/*" hidden onChange={e => { addCover(e.target.files[0]); e.target.value = ''; }} />
+        </div>
+        {coverError && <p className="ws-error span2">{coverError}</p>}
         <label className="span2">Trip name<input required value={f.name} onChange={set('name')} placeholder="e.g. Italy Explorer 2027" /></label>
         <label>Start date<input required type="date" value={f.start} onChange={set('start')} /></label>
         <label>End date<input required type="date" min={f.start || undefined} value={f.end} onChange={set('end')} /></label>
@@ -420,6 +502,8 @@ const cleanPay = p => (p.amount === '' && !p.due ? null : { amount: p.amount ===
 // Without tripId the form asks which trip to add to.
 export function SupplierForm({ tripId, supplier, initial, onClose }) {
   const { trips, saveSupplier, deleteSupplier } = useStore();
+  // Contract uploads switch on once files are stored in Supabase Storage (the document UI is ready for it).
+  const canAttach = false;
   const [targetTrip, setTargetTrip] = useState(tripId || trips[0]?.id || '');
   const [mode, setMode] = useState('manual');
   const [pasted, setPasted] = useState('');
@@ -601,8 +685,10 @@ export function SupplierForm({ tripId, supplier, initial, onClose }) {
           <label className="span2"><span>Paste a supplier email or message <span className="ws-optional">(optional)</span></span>
             <textarea rows={6} value={pasted} onChange={e => setPasted(e.target.value)} placeholder="Paste a confirmation from a hotel, coach company or guide…" />
           </label>
-          <DocumentField large docs={f.documents} onAdd={addDocument} onRemove={removeDocument} error={docError} />
-          <p className="ws-callout span2"><Icon name="info" size={18} />AI suggestions are an early access concept and aren’t connected in this demo. Pasted text goes into the notes, and the contract is attached to this supplier so it’s always one click away. You fill in the details yourself.</p>
+          {canAttach
+            ? <DocumentField large docs={f.documents} onAdd={addDocument} onRemove={removeDocument} error={docError} />
+            : <p className="ws-callout span2"><Icon name="file" size={18} />Contract uploads are coming soon to your workspace. For now, paste the email text here and keep the contract in your usual folder.</p>}
+          <p className="ws-callout span2"><Icon name="info" size={18} />AI suggestions are an early access concept and aren’t connected yet. Pasted text goes into the notes{canAttach ? ', and the contract is attached to this supplier so it’s always one click away' : ''}. You fill in the details yourself.</p>
           <div className="ws-form-actions span2">
             <button type="button" className="ws-btn" onClick={cancel}>Cancel</button>
             <button type="button" className="ws-btn primary" disabled={!pasted.trim() && !f.documents.length} onClick={usePasted}>Continue <Icon name="arrow" size={16} /></button>
@@ -635,7 +721,7 @@ export function SupplierForm({ tripId, supplier, initial, onClose }) {
           {payFields('deposit', 'Deposit')}
           {payFields('balance', 'Final balance')}
           <label className="span2">Notes<textarea rows={3} value={f.notes} onChange={set('notes')} placeholder="Rooms, times, special requests…" /></label>
-          <DocumentField docs={f.documents} onAdd={addDocument} onRemove={removeDocument} error={docError} />
+          {canAttach && <DocumentField docs={f.documents} onAdd={addDocument} onRemove={removeDocument} error={docError} />}
           <div className="ws-form-actions span2">
             {supplier && <button type="button" className="ws-btn danger" onClick={remove}><Icon name="trash" size={16} />Remove</button>}
             <button type="button" className="ws-btn" onClick={cancel}>Cancel</button>

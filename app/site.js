@@ -6,5 +6,5 @@ export const site = {
   contactEmail: '[contact email]',
   country: '[Country, e.g. England and Wales]',
   founderName: 'Chisom',
-  legalUpdated: '28 October 2026',
+  legalUpdated: '8 November 2026',
 };

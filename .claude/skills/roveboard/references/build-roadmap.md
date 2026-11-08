@@ -43,6 +43,14 @@ Milestones:
 
 Exit criteria: 5 or more operators have clicked through it on a call, and the top confusions are fixed.
 
+## Stage 2 progress (2026-11-08)
+- **Database:** `supabase/migrations/20261108_initial_schema.sql` (organizations, memberships, trips, suppliers, waitlist), with RLS via `is_member(org)` and `create_organization()` (one workspace per user). Auto-expose of new tables is off, so grants are explicit. Verified from outside: anonymous users can read nothing and can only insert into the waitlist.
+- **Auth:** `@supabase/ssr` with `app/lib/supabase/{client,server}.js`. `proxy.js` (Next 16's renamed middleware) refreshes sessions via `getClaims()` on workspace and auth routes. `app/lib/session.js` has `getWorkspaceSession()` (demo/live, user, org) and `getAuthSettings()` (is Google enabled?). Pages: `app/(auth)/login` (email+password, Google), `app/(auth)/onboarding` ("Name your company"), and `app/auth/callback/route.js` (OAuth code exchange, same-site redirects only).
+- **Store:** `store.js` has `DemoStoreProvider` (localStorage) and `LiveStoreProvider` (Supabase; optimistic updates, reload on failure), chosen by the server layout. Ids are `crypto.randomUUID()`.
+- **Waitlist:** now inserts into the Supabase `waitlist` table (works on Vercel).
+- **Tested** (2026-11-08) against the real project: demo regressions, full live journey, and cross-company isolation attacks through the API (46 checks). Test scripts live in the session scratchpad, not the repo.
+- **Next:** Google provider setup (Google Cloud OAuth client, plus Supabase Site URL and redirect URLs), Supabase Storage for documents and photos, then Resend SMTP and turning "Confirm email" back on, then reminders, then AI.
+
 ## Stage 2: private pilot (2–3 design-partner companies)
 1. Supabase Auth with organization workspaces and row-level security (database rules so one company can't see another's data).
 2. Move the data model to Postgres (tables from prd.md).

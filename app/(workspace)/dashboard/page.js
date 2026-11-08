@@ -1,14 +1,6 @@
-'use client';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useStore } from '../store';
+import { redirect } from 'next/navigation';
 
-// Where "Log in" lands: the first trip's overview, or the trip list if there are none.
+// "Log in" lands here. The home screen is the trip list, since a company usually has several trips.
 export default function Dashboard() {
-  const { trips } = useStore();
-  const router = useRouter();
-  useEffect(() => {
-    router.replace(trips[0] ? `/trips/${trips[0].id}` : '/trips');
-  }, [trips, router]);
-  return null;
+  redirect('/trips');
 }

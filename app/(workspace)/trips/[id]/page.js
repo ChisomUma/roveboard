@@ -56,6 +56,7 @@ export default function TripPage() {
       </PageHead>
 
       <div className="ws-body">
+        {trip.isSample && <p className="ws-sample-bar ws-gap"><Icon name="info" size={18} /><span><b>Sample trip.</b> Its suppliers and payments are made up to show you how Roveboard works. You can remove sample trips from the Trips page.</span></p>}
         {imported > 0 && <p className="ws-callout ws-gap" role="status"><Icon name="check" size={18} />{imported} supplier{imported === 1 ? '' : 's'} imported from your spreadsheet. Click any row to check or edit the details.</p>}
         {tab === 'Overview' && (
           <>
@@ -69,7 +70,7 @@ export default function TripPage() {
         {tab === 'Itinerary' && <Empty icon="calendar" title="Itinerary is coming later" text="A day-by-day plan built from your confirmed suppliers is planned for a later version." />}
         {tab === 'Documents' && (documentRows([trip]).length
           ? <DocumentList rows={documentRows([trip])} />
-          : <Empty icon="file" title="No documents yet" text="Attach a supplier’s contract or confirmation when you add or edit a supplier, and it will appear here." action={<button className="ws-btn" onClick={addSupplier}>Add supplier</button>} />)}
+          : <Empty icon="file" title="Documents are coming soon" text="Soon you’ll attach supplier contracts and confirmations here, stored safely for your whole team." />)}
         {tab === 'Deadlines' && <DeadlineSections trips={[trip]} />}
       </div>
 

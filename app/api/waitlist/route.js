@@ -1,11 +1,8 @@
-import { appendFile, mkdir, readFile } from 'node:fs/promises';
-import path from 'node:path';
+import { createClient } from '@supabase/supabase-js';
 import { ROLES, VOLUMES } from '../../waitlist-options';
 
-// Stage 1: sign-ups are appended to data/waitlist.jsonl (one JSON object per line).
-// This works on your computer or any server with a disk. Hosts like Vercel have no writable disk,
-// so before going online this must move to real storage (e.g. a Supabase table); see the roadmap.
-const FILE = path.join(process.cwd(), 'data', 'waitlist.jsonl');
+// "Get product updates" sign-ups are saved to the Supabase `waitlist` table (works on Vercel). The table's security rules
+// let anyone add a row but nobody read the list through the API: view it in the Supabase dashboard.
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export async function POST(request) {
@@ -22,22 +19,25 @@ export async function POST(request) {
   const email = String(body.email || '').trim().toLowerCase().slice(0, 254);
   if (!EMAIL.test(email)) return Response.json({ error: 'Please enter a valid email address.' }, { status: 400 });
 
-  const entry = {
-    email,
-    role: ROLES.includes(body.role) ? body.role : '',
-    tripsPerYear: VOLUMES.includes(body.tripsPerYear) ? body.tripsPerYear : '',
-    consent: 'Email me about Roveboard early access (see Privacy Policy).',
-    at: new Date().toISOString(),
-  };
-
-  try {
-    await mkdir(path.dirname(FILE), { recursive: true });
-    const existing = await readFile(FILE, 'utf8').catch(() => '');
-    const already = existing.split('\n').some(line => line && JSON.parse(line).email === email);
-    if (!already) await appendFile(FILE, JSON.stringify(entry) + '\n');
-    return Response.json({ ok: true, already });
-  } catch (err) {
-    console.error('Waitlist save failed:', err);
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !key) {
+    console.error('Waitlist: Supabase environment variables are missing.');
     return Response.json({ error: 'Sorry, we couldn’t save that right now. Please try again later.' }, { status: 500 });
   }
+
+  const supabase = createClient(url, key, { auth: { persistSession: false } });
+  const { error } = await supabase.from('waitlist').insert({
+    email,
+    role: ROLES.includes(body.role) ? body.role : null,
+    trips_per_year: VOLUMES.includes(body.tripsPerYear) ? body.tripsPerYear : null,
+    consent: 'Email me Roveboard product updates (see Privacy Policy).',
+  });
+
+  if (error?.code === '23505') return Response.json({ ok: true, already: true }); // already on the list
+  if (error) {
+    console.error('Waitlist save failed:', error);
+    return Response.json({ error: 'Sorry, we couldn’t save that right now. Please try again later.' }, { status: 500 });
+  }
+  return Response.json({ ok: true, already: false });
 }
