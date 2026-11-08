@@ -268,7 +268,7 @@
 .pr-toggle button{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border:0;border-radius:999px;background:none;color:var(--soft);font-size:15px;font-weight:600}
 .pr-toggle button.on{background:var(--navy);color:#fff}
 .pr-toggle span{padding:3px 8px;border-radius:999px;background:#e3f9ee;color:#1b8a5a;font-size:12px;font-weight:700}
-.pr-plans{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;align-items:start}
+.pr-plans{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;align-items:stretch} /* equal-height cards */
 .pr-plan{position:relative;padding:30px 28px;border:1px solid #e3eaf1;border-radius:18px;background:#fff;box-shadow:0 12px 34px #0b23421a;color:var(--ink)}
 .pr-plan.is-popular{border:2px solid var(--cyan);box-shadow:0 18px 44px #0b234226}
 .pr-badge{position:absolute;top:-13px;left:28px;margin:0!important;padding:5px 12px;border-radius:999px;background:var(--cyan);color:#062544;font-size:12px;font-weight:700}
