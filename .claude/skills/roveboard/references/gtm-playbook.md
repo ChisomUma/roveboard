@@ -1,5 +1,7 @@
 # Go-to-market and launch playbook
 
+This file covers validation and design-partner pilots. Post-launch growth (SEO, GEO, blog, LinkedIn, inbound, outbound, the launch plan) lives in the `roveboard-growth` skill, which starts once the readiness gates are met.
+
 The first job isn't building; it's proving that coordinators feel this pain often enough to **use** and **pay for** a dedicated tool. Every build milestone should come with a customer action.
 
 ## 1. Pick a beachhead (narrow first)

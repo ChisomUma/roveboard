@@ -22,6 +22,7 @@ Read only what the task needs:
 | `references/build-roadmap.md` | Planning or starting engineering work. It holds the stack, stages, milestones and what exists in the repo today |
 | `references/gtm-playbook.md` | Anything about customers, validation, pricing, waitlist, marketing, launch or first users |
 | `references/tooling-radar.md` | Any engineering work, planning, or "what do we need to be production-ready". It lists the third-party tools in use, next and later, each with its trigger and cost |
+| `../roveboard-growth/` (separate skill) | Marketing after launch readiness: SEO, GEO (AI search), blog, LinkedIn, inbound, outbound, launch plan. Load the `roveboard-growth` skill for any of these |
 | `references/decisions.md` | At the start of a session, to recall what's decided and what's open. **Append to it** whenever a decision is made |
 
 ## Operating principles
