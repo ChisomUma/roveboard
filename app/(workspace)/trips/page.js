@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useStore } from '../store';
 import { Empty, Icon, PageHead, TripForm, fmtDate, fmtRange, money, nextPayment, tripMoney, tripStats } from '../ui';
+import { downloadTripsCsv } from '../export';
 
 // ⋯ menu on a trip card: Edit and Delete.
 function TripMenu({ trip, onEdit }) {
@@ -41,15 +42,23 @@ function TripMenu({ trip, onEdit }) {
 }
 
 export default function TripsPage() {
-  const { trips, removeSampleTrips } = useStore();
+  const { trips, removeSampleTrips, session, notify } = useStore();
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState(null);
   const sampleCount = trips.filter(t => t.isSample).length; // only workspaces created while samples were seeded
   const create = <button className="ws-btn primary" onClick={() => setCreating(true)}><Icon name="plus" size={16} />Create trip</button>;
+  function exportAll() {
+    const suppliers = downloadTripsCsv(trips, `${session.org.name} trips`);
+    notify(`Exported ${trips.length} trip${trips.length === 1 ? '' : 's'} and ${suppliers} supplier${suppliers === 1 ? '' : 's'}`);
+  }
+  const actions = <>
+    {trips.length > 0 && <button className="ws-btn ghost" onClick={exportAll}><Icon name="file" size={16} />Export</button>}
+    {create}
+  </>;
 
   return (
     <>
-      <PageHead title="Trips" sub={<p className="ws-sub">Everything you’re planning, in one place.</p>} actions={create} />
+      <PageHead title="Trips" sub={<p className="ws-sub">Everything you’re planning, in one place.</p>} actions={actions} />
       <div className="ws-body">
         {sampleCount > 0 && (
           <div className="ws-sample-bar">

@@ -29,7 +29,7 @@ const steps = [
 const faqs = [
   ['Do my suppliers need an account?', 'No. Hotels, coach companies and guides never need to sign up or pay. You keep talking to them by email or WhatsApp as you do today, and record what they confirm in Roveboard.'],
   ['Does Roveboard handle payments?', 'No. Roveboard tracks deposits and final balances, and when they’re due, so nothing is missed. You pay suppliers your usual way and mark the payment as paid. Roveboard never holds or moves your money.'],
-  ['Is my data safe?', 'Each company’s trips and suppliers are private to that company. Security rules in the database itself stop anyone else from seeing them, and your data is stored with established cloud providers. Exporting your data is on our roadmap.'],
+  ['Is my data safe?', 'Each company’s trips and suppliers are private to that company. Security rules in the database itself stop anyone else from seeing them, and your data is stored with established cloud providers. You can export your trips and suppliers to a spreadsheet at any time.'],
   ['Can I bring in my spreadsheet?', 'Yes. You can import suppliers from a CSV file, or copy cells straight from Excel or Google Sheets and paste them in. Roveboard matches your columns and shows a preview before anything is added.'],
   ['Does the AI read my emails?', 'Only what you choose to paste or upload. AI suggestions are an early access concept: Roveboard will suggest details from a supplier email or contract, and nothing is saved until you’ve reviewed and confirmed it.'],
   ['How much will it cost?', 'Plans start at £29 a month billed yearly, priced by how many trips you run, with a 20-day free trial and no credit card needed. See our Pricing page for details. Suppliers never pay.'],

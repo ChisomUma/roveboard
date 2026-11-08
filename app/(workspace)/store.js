@@ -145,7 +145,7 @@ function LiveStoreProvider({ session, children }) {
   };
 
   return (
-    <StoreContext.Provider value={{ ...data, session, ready, saveError, clearSaveError: () => setSaveError(''), toasts, ...actions }}>
+    <StoreContext.Provider value={{ ...data, session, ready, saveError, clearSaveError: () => setSaveError(''), toasts, notify, ...actions }}>
       {children}
     </StoreContext.Provider>
   );

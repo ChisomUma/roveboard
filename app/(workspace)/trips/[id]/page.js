@@ -6,12 +6,13 @@ import { useStore } from '../../store';
 import { DeadlineSections, Empty, Icon, MoneySummary, PageHead, SupplierContacts, SupplierForm, SupplierTable, TripForm, fmtRange, tripStats } from '../../ui';
 import { ImportDialog } from '../../import';
 import { DocumentList, documentRows } from '../../documents';
+import { downloadTripsCsv } from '../../export';
 
 const TABS = ['Overview', 'Suppliers', 'Itinerary', 'Documents', 'Deadlines'];
 
 export default function TripPage() {
   const { id } = useParams();
-  const { trips } = useStore();
+  const { trips, notify } = useStore();
   const trip = trips.find(t => t.id === id);
   const [tab, setTab] = useState('Overview');
   const [modal, setModal] = useState(null);
@@ -47,6 +48,7 @@ export default function TripPage() {
         actions={<>
           <button className="ws-btn ghost" onClick={() => setModal({ type: 'trip' })}>Edit trip</button>
           <button className="ws-btn ghost" onClick={importSuppliers}><Icon name="upload" size={16} />Import</button>
+          <button className="ws-btn ghost" onClick={() => { const n = downloadTripsCsv([trip], trip.name); notify(`Exported ${trip.name} (${n} supplier${n === 1 ? '' : 's'})`); }}><Icon name="file" size={16} />Export</button>
           <button className="ws-btn" onClick={addSupplier}>Add supplier <Icon name="plus" size={18} /></button>
         </>}
       >

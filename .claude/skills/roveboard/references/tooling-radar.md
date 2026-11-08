@@ -18,6 +18,7 @@ Third-party tools that make Roveboard production-ready and world-class, with **w
 | **Supabase** (Free) | Postgres, Auth (email/password; Google pending), RLS | Free projects pause after 1 week of inactivity; Pro is from $25/mo. Check backup options before relying on it for paying customers |
 | **GitHub** | Code and version history | Repo `ChisomUma/roveboard`; recommend keeping it private |
 | **Unsplash** | Photos | Credits in `IMAGE-CREDITS.md` |
+| **CSV export** (built in, `app/(workspace)/export.js`) | "Your data is yours": all trips (Trips page) or one trip (trip page) to a spreadsheet; columns match the import template so exports re-import | Built 2026-11-08; CSV-injection-safe, UTF-8 BOM for Excel |
 
 ## Next (adopt during the private pilot)
 
@@ -49,6 +50,8 @@ Third-party tools that make Roveboard production-ready and world-class, with **w
 | **Supabase Realtime** | Live updates when teammates edit the same trip | Team collaboration feature |
 | **Xero / QuickBooks APIs** | Sync supplier payments to accounting | Customers ask (per the "integrate, don't build" decision) |
 | **Travefy / Tourwriter integrations** | Send confirmed supplier details to itineraries | Operators commonly use them (track in interviews) |
+| **Zapier / Make** app | No-code connections to 1,000+ apps (e.g. "deposit marked paid → Google Sheets/Slack") without a full public API | Several customers ask for "Roveboard + X" |
+| **Public REST API + webhooks** (versioned, API keys, docs, Upstash rate limiting) | Larger operators connect their own reservation systems; offer it as a Business/Enterprise feature | Business or Enterprise prospects need it to buy, or partners want to build on Roveboard. Not before: an API is a product to maintain. Don't expose Supabase's internal REST as the public API |
 | **Nylas** (or the Gmail/Microsoft Graph APIs) | Connected inboxes | Later-stage feature; paid |
 | **TypeScript + ESLint + Prettier** | Fewer bugs as the codebase and team grow | Before hiring a second developer, or once the codebase gets larger |
 | **Postgres full-text search → Typesense/Algolia** | Search across trips and suppliers | Search becomes slow or important |
