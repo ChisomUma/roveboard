@@ -5,3 +5,7 @@ node_modules/
 # Waitlist sign-ups are personal data; never commit them.
 data/
 .DS_Store
+# Test results (Playwright)
+/test-results/
+/playwright-report/
+/blob-report/

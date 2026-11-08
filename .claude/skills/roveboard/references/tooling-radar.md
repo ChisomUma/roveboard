@@ -18,6 +18,9 @@ Third-party tools that make Roveboard production-ready and world-class, with **w
 | **Supabase** (Free) | Postgres, Auth (email/password; Google pending), RLS | Free projects pause after 1 week of inactivity; Pro is from $25/mo. Check backup options before relying on it for paying customers |
 | **GitHub** | Code and version history | Repo `ChisomUma/roveboard`; recommend keeping it private |
 | **Unsplash** | Photos | Credits in `IMAGE-CREDITS.md` |
+| **Playwright + GitHub Actions** | 17 end-to-end tests (`tests/`) on every push and PR, against a throwaway local Supabase (Supabase CLI in Docker) | Adopted 2026-11-09. Free while the repo is public; a private repo gets 2,000 free minutes/month (a run takes ~5 min, so ~400 runs) |
+| **Supabase CLI** (`npx supabase@2.122.0`; `supabase/setup-cli` in CI; not an npm dependency, to keep Vercel installs lean) | Local/test database from `supabase/migrations/`; later `supabase db push` instead of pasting SQL | Adopted 2026-11-09 (pinned 2.122.0; v3 is out, upgrade deliberately) |
+| **Dependabot** (`.github/dependabot.yml`) | Weekly grouped package-update PRs, tested automatically | Adopted 2026-11-09. Founder: also switch on "Dependabot security updates" in repo settings |
 | **CSV export** (built in, `app/(workspace)/export.js`) | "Your data is yours": all trips (Trips page) or one trip (trip page) to a spreadsheet; columns match the import template so exports re-import | Built 2026-11-08; CSV-injection-safe, UTF-8 BOM for Excel |
 
 ## Next (adopt during the private pilot)
@@ -26,13 +29,11 @@ Third-party tools that make Roveboard production-ready and world-class, with **w
 |---|---|---|---|
 | **Sentry** | Error monitoring: get told when something breaks for a user, with the details | Before the first pilot company uses it | Free developer tier |
 | **PostHog** | Product analytics (sign-up funnel, which features get used), session replay, feature flags | As soon as real sign-ups arrive | Generous free tier |
-| **Playwright + GitHub Actions** | End-to-end tests kept in the repo and run on every push | Now: our click-test scripts lived in a temp folder and were lost twice | Free for public repos; free minutes for private |
 | **Supabase Storage** | Contracts and supplier photos in the cloud (re-enables uploads) | Next feature, per roadmap | Included (1 GB free) |
 | **Resend** (+ React Email) | Login and confirmation emails (custom SMTP), deadline reminders | Before switching "Confirm email" back on; before reminders | Free tier; needs a domain (~£10/yr) |
 | **Domain** (Cloudflare Registrar or Namecheap) | roveboard.co or similar; needed for proper email | Before public launch or email sending | ~£10–15/yr |
 | **Cloudflare Turnstile** | Free CAPTCHA on sign-up, so bots don't create accounts (Supabase supports it) | When sign-ups are public and spam appears, or before launch | Free |
 | **Google OAuth** (Google Cloud) | "Sign in with Google" | Founder asked for it; pending setup | Free |
-| **Dependabot** (GitHub) | Automatic pull requests for security updates to packages | Now, a one-time switch | Free |
 | **UptimeRobot / Better Stack** | Alert if the site goes down; optional status page | Before the pilot | Free tiers |
 | **Bitwarden** (for the founder) | Password manager for all these accounts and secrets | Now | Free |
 

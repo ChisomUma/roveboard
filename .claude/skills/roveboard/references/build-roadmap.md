@@ -26,7 +26,7 @@
 - Not yet covered: step 4's real AI review screen with source highlighting, the Today view, a "next action" column, reminders, and the itinerary and documents tabs (honest placeholders).
 - `public/images/`: real Unsplash photos (2026-10-28), replacing the earlier crops from the mockup. Sources are in `IMAGE-CREDITS.md`.
 - **Git:** pushed to GitHub at `ChisomUma/roveboard` (branch `main`, remote over SSH host alias `github-second`) on 2026-10-28. It was **public** at first; recommend private, because `.claude/` holds strategy docs. Commit or push only when the founder asks.
-- No automated tests in the repo, no backend, and no online waitlist yet. A click-through check was run with headless Chrome over the DevTools protocol (22 checks); the script isn't in the repo.
+- (Superseded 2026-11-09) Automated tests now live in the repo: 17 Playwright tests in `tests/` run on GitHub for every push and PR (see "Engineering conventions" in SKILL.md).
 
 ## Stage 1: interactive prototype (now)
 Goal: a clickable, realistic product that operators can try in a 20-minute call. It uses sample data, needs no accounts and is free to host.
@@ -44,7 +44,7 @@ Milestones:
 Exit criteria: 5 or more operators have clicked through it on a call, and the top confusions are fixed.
 
 ## Stage 2 progress (2026-11-08)
-- **Database:** `supabase/migrations/20261108_initial_schema.sql` (organizations, memberships, trips, suppliers, waitlist), with RLS via `is_member(org)` and `create_organization()` (one workspace per user). Auto-expose of new tables is off, so grants are explicit. Verified from outside: anonymous users can read nothing and can only insert into the waitlist.
+- **Database:** `supabase/migrations/20261108000100_initial_schema.sql` (organizations, memberships, trips, suppliers, waitlist), with RLS via `is_member(org)` and `create_organization()` (one workspace per user). Auto-expose of new tables is off, so grants are explicit. Verified from outside: anonymous users can read nothing and can only insert into the waitlist.
 - **Auth:** `@supabase/ssr` with `app/lib/supabase/{client,server}.js`. `proxy.js` (Next 16's renamed middleware) refreshes sessions via `getClaims()` on workspace and auth routes. `app/lib/session.js` has `getWorkspaceSession()` (demo/live, user, org) and `getAuthSettings()` (is Google enabled?). Pages: `app/(auth)/login` (email+password, Google), `app/(auth)/onboarding` ("Name your company"), and `app/auth/callback/route.js` (OAuth code exchange, same-site redirects only).
 - **Store:** `store.js` has `DemoStoreProvider` (localStorage) and `LiveStoreProvider` (Supabase; optimistic updates, reload on failure), chosen by the server layout. Ids are `crypto.randomUUID()`.
 - **Waitlist:** now inserts into the Supabase `waitlist` table (works on Vercel).

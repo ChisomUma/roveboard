@@ -1,5 +1,5 @@
 // Sign-up step 2 options. Keep these in sync with the checks in
-// supabase/migrations/20261108_signup_questions.sql (the database rejects anything else).
+// supabase/migrations/20261108000300_signup_questions.sql (the database rejects anything else).
 export { ROLES as BUSINESS_TYPES, VOLUMES as TRIP_VOLUMES } from '../../waitlist-options';
 
 // [value, soon?]: "coming soon" features are labelled honestly; interest in them tells us what to build next.

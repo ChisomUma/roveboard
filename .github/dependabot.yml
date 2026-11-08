@@ -1,0 +1,20 @@
+# Dependabot opens pull requests when our packages have updates. Small updates are grouped into one
+# weekly pull request; the tests run on each one, so a green ✓ means it's safe to merge.
+# Security fixes arrive separately and straight away (turn on "Dependabot security updates" in
+# GitHub → Settings → Advanced Security).
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
