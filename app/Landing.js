@@ -153,7 +153,8 @@ export default function Landing() {
         <SiteNav />
         <div className="lp-wrap lp-hero-copy">
           <h1>The calm behind<br />every great trip.</h1>
-          <p className="lp-lead">Track confirmations, deposits and deadlines for every supplier on every trip.</p>
+          {/* Positioning (decisions.md 2026-11-09). Add "contracts" to the list once document uploads ship. */}
+          <p className="lp-lead"><strong>The supplier operations platform for travel companies.</strong> One place to manage supplier relationships, trip commitments, confirmations and payments, and to catch risks before they affect a departure.</p>
           <p className="lp-audience">Built for tour operators, DMCs, travel agencies and wholesalers.</p>
           <Link className="lp-btn" href="/login?mode=signup">Get started free <Icon name="arrow" /></Link>
         </div>

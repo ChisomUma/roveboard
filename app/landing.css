@@ -312,3 +312,4 @@
 }
 @media (max-width:640px){.lp-updates .lp-wl input{font-size:16px}}
 .lp-btn-static,.lp-btn-static:hover{cursor:default;transform:none;box-shadow:none}
+.lp-lead strong{display:block;margin-bottom:10px;font-weight:700;color:#fff}

@@ -28,15 +28,23 @@ Collect real phrases from interviews and add them here with the date and source 
 - "When a group grows from 20 to 24, I have to update every supplier and hope I didn't miss one."
 - "It all lives in one person's head. If they're off sick, we're stuck."
 
-## Positioning statement
+## Positioning (founder decision, 2026-11-09)
 
-For **small group tour operators and DMCs** who **coordinate suppliers across email, WhatsApp and spreadsheets**, Roveboard is **a supplier-tracking board for every trip** that **shows what's confirmed, what's owed and what's due next, so deadlines don't slip**. Unlike **full reservation systems**, it **sets up in an afternoon from your existing spreadsheet**, and unlike **a spreadsheet**, it **tells you what needs action today**.
+**Category line (use it identically everywhere: site, LinkedIn tagline, directories, bios, pitch decks):**
+> The supplier operations platform for travel companies.
 
-**One-liner (use it identically everywhere: site, LinkedIn, directories, bios):**
-> Roveboard helps tour operators and DMCs track every supplier on a trip: what's confirmed, what's owed and when it's due.
+**Full positioning (founder's wording; use as written internally, in pitches and once the features exist):**
+> The supplier operations platform for travel companies. One place to manage supplier relationships, trip commitments, confirmations, payments, contracts and operational risks.
+
+**Public version until document uploads ship (the website hero uses this):**
+> The supplier operations platform for travel companies. One place to manage supplier relationships, trip commitments, confirmations and payments, and to catch risks before they affect a departure.
+
+Honesty rule for this line: add "contracts" publicly once contract/document uploads are live; describe "risks" only as what Roveboard actually flags (today: overdue payments and unconfirmed suppliers; later: contract expiry, compliance, concentration risk per the roadmap). The beachhead stays small-to-mid operators, so in outreach lead with their concrete pain (missed deposits, unconfirmed suppliers) and use the category line as the frame, not the pitch.
+
+**Positioning statement (for sales thinking):** for **tour operators and DMCs** who **coordinate suppliers across email, WhatsApp and spreadsheets**, Roveboard is **the supplier operations platform** that **shows what's confirmed, what's owed and what's at risk across every trip**. Unlike **full reservation systems**, it **sets up in an afternoon from your existing spreadsheet**, and unlike **a spreadsheet**, it **tells you what needs action today**.
 
 **Short boilerplate (about 50 words):**
-> Roveboard is supplier tracking for group trips. Tour operators, DMCs and travel agencies use it to see, for every trip, which hotels, coaches and guides are confirmed, which deposits and balances are owed, and what's due next. It imports your existing spreadsheet, and you can export everything any time.
+> Roveboard is the supplier operations platform for travel companies. Tour operators, DMCs and travel agencies use it to manage their suppliers and see, for every trip, which hotels, coaches and guides are confirmed, which deposits and balances are owed, and what needs attention next. It imports your existing spreadsheet, and you can export everything any time.
 (Once registered, add "Roveboard Ltd is registered in England and Wales." Don't say "built in the UK": the founder works from Nigeria, and claims must be true.)
 
 ## Message pillars (with proof)

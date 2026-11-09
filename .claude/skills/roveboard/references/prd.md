@@ -1,7 +1,7 @@
 # Roveboard PRD
 
 ## One line
-Roveboard is a trip coordination dashboard: one place for a travel company to track every supplier on a trip — what's confirmed, what's pending, what's owed and when.
+Roveboard is the supplier operations platform for travel companies (positioning decided 2026-11-09). Today it's one place for a travel company to track every supplier on every trip: what's confirmed, what's pending, what's owed and when. The roadmap grows it into contracts, compliance and supplier risk.
 
 ## The problem
 A group trip involves many **suppliers** (hotels, coaches, guides, restaurants, activity providers). Each sends emails, WhatsApp messages, PDFs and contracts with prices and payment deadlines. Coordinators keep this across inboxes, spreadsheets and calendars, so things get missed: a deposit deadline slips, a restaurant never confirms, a room count change goes unnoticed.
