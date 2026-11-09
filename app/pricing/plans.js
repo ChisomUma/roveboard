@@ -37,5 +37,5 @@ export const PLANS = [
 ];
 
 // Included in every plan today, and on the way.
-export const INCLUDED = ['Unlimited suppliers on every trip', 'Confirmation status for every supplier', 'Deposits, final balances and due dates', 'Money summary: paid, owed and overdue', 'Deadlines across all your trips', 'Spreadsheet import (CSV, or paste from Excel or Google Sheets)', 'Supplier directory and one-click reuse', 'Export everything to a spreadsheet, any time', 'Private, secure workspace for your company'];
+export const INCLUDED = ['Unlimited suppliers on every trip', 'Confirmation status for every supplier', 'Deposits, final balances and due dates', 'Money summary showing what’s paid, owed and overdue', 'Deadlines across all your trips', 'Spreadsheet import (CSV, or paste from Excel or Google Sheets)', 'Supplier directory and one-click reuse', 'Export everything to a spreadsheet, any time', 'Private, secure workspace for your company'];
 export const COMING_SOON = ['Email reminders before deadlines', 'AI reading of supplier emails and contracts', 'Contract and document uploads', 'Team members and collaboration'];

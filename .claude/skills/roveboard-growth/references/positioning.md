@@ -59,6 +59,8 @@ For **small group tour operators and DMCs** who **coordinate suppliers across em
 
 **Avoid:** revolutionise, seamless, game-changer, all-in-one, AI-powered (until the AI is built and then only describing what it actually does), "booking engine" (we don't book), "payments" as a verb (we track, never process), "industry-leading", "trusted by thousands".
 
+**Punctuation (founder rule, 2026-11-09):** no em dashes (—) anywhere in copy, and no "statement, colon, list" constructions ("Group trips run on many conversations: a, b, c"). The founder sees both as AI tells. Use full sentences instead. Colons are fine only as labels in data or UI ("Total: €4,800"). En dashes in number and date ranges ("12–15 September") are OK.
+
 **Spelling:** UK English for UK/EU audiences (travellers, organise). Use the currency symbol of the audience (£ in the UK, € in the EU, $ in the US).
 
 ## Pricing in marketing

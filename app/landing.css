@@ -311,3 +311,4 @@
   .pr-toggle button{padding:10px 14px}
 }
 @media (max-width:640px){.lp-updates .lp-wl input{font-size:16px}}
+.lp-btn-static,.lp-btn-static:hover{cursor:default;transform:none;box-shadow:none}

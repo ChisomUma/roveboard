@@ -20,20 +20,20 @@ const suppliers = [
 ];
 
 const steps = [
-  ['Add your suppliers', 'Keep all your hotels, transport, guides and activity providers in one place.'],
-  ['Track confirmations\nand payments', 'See what’s confirmed, what’s pending and what’s due — at a glance.'],
-  ['Stay on top of deadlines', 'Get a clear view of upcoming deposits and final balances so you can plan ahead with confidence.'],
+  ['Add your suppliers', 'Enter each hotel, coach, guide and activity provider, or import them from your spreadsheet.'],
+  ['Track confirmations\nand payments', 'See what’s confirmed, what’s pending and what’s owed at a glance.'],
+  ['Stay on top of deadlines', 'See every upcoming deposit and final balance across all your trips, with overdue payments flagged.'],
 ];
 
 // Answers must stay true to what exists today; update them as features ship.
 const faqs = [
   ['Do my suppliers need an account?', 'No. Hotels, coach companies and guides never need to sign up or pay. You keep talking to them by email or WhatsApp as you do today, and record what they confirm in Roveboard.'],
-  ['Does Roveboard handle payments?', 'No. Roveboard tracks deposits and final balances, and when they’re due, so nothing is missed. You pay suppliers your usual way and mark the payment as paid. Roveboard never holds or moves your money.'],
-  ['Is my data safe?', 'Each company’s trips and suppliers are private to that company. Security rules in the database itself stop anyone else from seeing them, and your data is stored with established cloud providers. You can export your trips and suppliers to a spreadsheet at any time.'],
+  ['Does Roveboard handle payments?', 'No. Roveboard tracks each deposit and final balance and when it’s due. You pay suppliers the way you always do, then mark the payment as paid. Roveboard never holds or moves your money.'],
+  ['Is my data safe?', 'Each company’s trips and suppliers are private to that company. Security rules built into the database stop anyone else from seeing them. Your data is stored with established cloud providers, and you can export your trips and suppliers to a spreadsheet at any time.'],
   ['Can I bring in my spreadsheet?', 'Yes. You can import suppliers from a CSV file, or copy cells straight from Excel or Google Sheets and paste them in. Roveboard matches your columns and shows a preview before anything is added.'],
-  ['Does the AI read my emails?', 'Only what you choose to paste or upload. AI suggestions are an early access concept: Roveboard will suggest details from a supplier email or contract, and nothing is saved until you’ve reviewed and confirmed it.'],
-  ['How much will it cost?', 'Plans start at £29 a month billed yearly, priced by how many trips you run, with a 20-day free trial and no credit card needed. See our Pricing page for details. Suppliers never pay.'],
-  ['When can I start?', 'Right now. Create a free account and start adding your trips and suppliers. Some features, like AI suggestions and reminders, are still coming, and you can sign up for updates at the bottom of this page.'],
+  ['Will the AI read my emails?', 'AI suggestions aren’t available yet. When they arrive, Roveboard will only read what you choose to paste or upload, and nothing will be saved until you’ve reviewed and confirmed it.'],
+  ['How much will it cost?', 'Plans start at £29 a month, billed yearly, and are priced by how many trips you run. Every plan comes with a 20-day free trial, and no credit card is needed. Suppliers never pay. See the Pricing page for details.'],
+  ['When can I start?', 'Right now. Create an account and start adding your trips and suppliers. AI suggestions and deadline reminders are still on the way, and you can sign up at the bottom of this page to hear when they arrive.'],
 ];
 
 const suggestedFields = [
@@ -153,7 +153,7 @@ export default function Landing() {
         <SiteNav />
         <div className="lp-wrap lp-hero-copy">
           <h1>The calm behind<br />every great trip.</h1>
-          <p className="lp-lead">Keep supplier confirmations, contracts, deposits and deadlines together in one workspace.</p>
+          <p className="lp-lead">Track confirmations, deposits and deadlines for every supplier on every trip.</p>
           <p className="lp-audience">Built for tour operators, DMCs, travel agencies and wholesalers.</p>
           <Link className="lp-btn" href="/login?mode=signup">Get started free <Icon name="arrow" /></Link>
         </div>
@@ -168,8 +168,8 @@ export default function Landing() {
         <Badge />
         <div className="lp-wrap">
           <small className="lp-eyebrow">A simpler way to manage suppliers</small>
-          <h2 className="lp-h2">From first enquiry to final balance,<br />all in one place.</h2>
-          <p className="lp-sub">Roveboard keeps your hotels, transport, guides and more organised with clear confirmation statuses, deposit tracking and upcoming deadlines — so nothing gets missed.</p>
+          <h2 className="lp-h2">From first confirmation to final balance,<br />every supplier accounted for.</h2>
+          <p className="lp-sub">Every hotel, coach and guide gets a clear confirmation status, its deposit and final balance, and the date each one is due, so nothing gets missed.</p>
           <div className="lp-steps">
             {steps.map(([title, text], i) => (
               <article key={title}>
@@ -184,13 +184,13 @@ export default function Landing() {
 
       <section className="lp-ai">
         <div className="lp-wrap">
-          <small className="lp-eyebrow">Early access concept</small>
+          <small className="lp-eyebrow">Coming soon</small>
           <h2 className="lp-h2">Turn supplier documents<br />into trip details.</h2>
-          <p className="lp-sub">Paste a supplier email or upload a contract. AI suggests key details for you to review before adding them to your trip.</p>
+          <p className="lp-sub">Soon you’ll be able to paste a supplier email or upload a contract, and AI will suggest the key details for you to review before anything is added to your trip.</p>
           <div className="lp-ai-grid">
             <div className="lp-card">
               <div className="lp-card-head"><GmailMark />Supplier email<span className="lp-more"><Icon name="more" size={22} /></span></div>
-              <p className="lp-mail-meta">From: reservations@bellavista.it<br />Subject: Booking Confirmation – Hotel Bella Vista</p>
+              <p className="lp-mail-meta">From: reservations@bellavista.it<br />Subject: Your booking confirmation at Hotel Bella Vista</p>
               <div className="lp-mail-body">
                 <p>Dear Sarah,</p>
                 <p>We are pleased to confirm your reservation at Hotel Bella Vista, Rome.</p>
@@ -208,7 +208,7 @@ export default function Landing() {
               <path d="M4 34C20 12 44 6 70 16M59 8l12 8-12 6" />
             </svg>
             <div className="lp-card">
-              <div className="lp-card-head"><Sparkle />AI suggested details<span className="lp-tag">Early access concept</span></div>
+              <div className="lp-card-head"><Sparkle />AI suggested details<span className="lp-tag">Coming soon</span></div>
               <div className="lp-hotel">
                 <img src="/images/hotel-bella-vista-facade.jpg" alt="" />
                 <div><b>Hotel Bella Vista</b><small>Rome, Italy</small></div>
@@ -222,10 +222,11 @@ export default function Landing() {
                   <span className="lp-edit"><Icon name="pencil" size={16} />Edit</span>
                 </div>
               ))}
-              <Link className="lp-btn" href="/login?mode=signup">Review details <Icon name="arrow" /></Link>
+              {/* Part of the illustration, not a real button: this feature isn't built yet */}
+              <span className="lp-btn lp-btn-static" aria-hidden="true">Review details <Icon name="arrow" /></span>
             </div>
           </div>
-          <p className="lp-note"><Icon name="info" size={18} />This is a proposed early access concept. You’ll always review and confirm the details before adding them to your trip. No automatic booking.</p>
+          <p className="lp-note"><Icon name="info" size={18} />This feature is in development. You’ll always review and confirm the details before they’re added to your trip, and Roveboard never books anything for you.</p>
         </div>
         <svg className="lp-wave lp-wave-b" viewBox="0 0 300 110" aria-hidden="true"><path d="M0 104C90 104 150 40 300 8" /></svg>
       </section>
@@ -233,9 +234,9 @@ export default function Landing() {
       <section className="lp-people">
         <img src="/images/lake-varenna.jpg" alt="Colourful lakeside houses and boats in Varenna on Lake Como" />
         <div className="lp-people-copy">
-          <small className="lp-eyebrow">Built for travel people</small>
+          <small className="lp-eyebrow">Who it’s for</small>
           <h2 className="lp-h2">Built for the people who bring travel together.</h2>
-          <p className="lp-sub">Whether you plan group tours, custom journeys or destination experiences, Roveboard helps you keep every supplier on track.</p>
+          <p className="lp-sub">Whether you run group tours, tailor-made trips or destination experiences, Roveboard keeps every supplier on track.</p>
         </div>
         <svg className="lp-wave lp-wave-c" viewBox="0 0 640 90" aria-hidden="true"><path d="M0 80C120 80 170 22 310 32s220 40 330-22" /></svg>
       </section>
@@ -244,7 +245,7 @@ export default function Landing() {
         <div className="lp-wrap lp-founder-inner">
           <small className="lp-eyebrow">Why I’m building Roveboard</small>
           <blockquote>
-            <p>Group trips run on dozens of supplier conversations: a hotel deposit buried in one email thread, a coach confirmation on WhatsApp, a guide’s invoice in a PDF. When one detail slips, the whole trip feels it.</p>
+            <p>Group trips run on dozens of supplier conversations. The hotel deposit is buried in one email thread, the coach confirmation is somewhere in WhatsApp, and the guide’s invoice came as a PDF. When one detail slips, the whole trip feels it.</p>
             <p>I’m building Roveboard to give coordinators one calm place to see what’s confirmed, what’s owed and what’s next, without changing how they talk to their suppliers.</p>
             <p>Roveboard is in early access. If you coordinate group trips, I’d love to learn how you work today. Create a free account and tell me what you think.</p>
           </blockquote>
@@ -270,7 +271,7 @@ export default function Landing() {
       <section className="lp-closing" id="get-started">
         <div className="lp-wrap">
           <h2>A calmer way<br />to plan what’s next.</h2>
-          <p>Create your free account and set up your first trip today.</p>
+          <p>Start your 20-day free trial and set up your first trip today.</p>
           <Link className="lp-btn" href="/login?mode=signup">Get started free <Icon name="arrow" /></Link>
           <div className="lp-updates">
             <p className="lp-updates-title">Not ready yet? Get product updates by email.</p>
