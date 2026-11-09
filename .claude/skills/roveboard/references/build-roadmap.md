@@ -3,69 +3,107 @@
 ## Stack (decided)
 | Part | Tool | Why |
 |---|---|---|
-| Website and app | Next.js (App Router) | One codebase for the marketing site and the product; easy to hire for |
-| Database and login | Supabase (Postgres, Auth, Storage) | Real SQL, built-in auth, file storage for PDFs, generous free tier |
+| Website and app | Next.js 16 (App Router) | One codebase for the marketing site and the product; easy to hire for |
+| Database and login | Supabase (Postgres, Auth, Storage) | Real SQL, built-in auth, row-level security, file storage for PDFs, generous free tier |
 | AI extraction | Claude API (load the `claude-api` skill when implementing) | Reads emails and PDFs and returns structured fields; no model training needed |
-| Email reminders | Resend | Simple transactional email |
+| Email (login, reminders) | Resend | Simple transactional email; needs the domain |
 | Hosting | Vercel | Built for Next.js; preview links for every change |
+| Tests | Playwright + GitHub Actions | 19 tests on every push, against a throwaway local Supabase |
 
 **Ownership rule:** the founder creates every account (GitHub, Supabase, Vercel, Resend, AI provider, domain) under their own email and adds collaborators. The company must own its code, data and domain.
 
-## What exists today (update as it changes)
-- `app/page.js` renders `app/Landing.js` (styles in `app/landing.css`): the marketing landing page, matching the design mockup. "Log in", "Review details" and "Add supplier" link to `/dashboard`.
-- `app/components/icons.js`: the shared `Icon` set and `Logo`.
-- `app/(workspace)/`: the demo app, matching the dashboard design (done 2026-10-28):
-  - `store.js`: a React context holding seed data (Italy Explorer 2027 with 8 suppliers, Lisbon & Porto Discovery with 2), saved to `localStorage` under `roveboard-demo-v2`. **This is the file to swap for Supabase in stage 2.**
-  - `ui.js`: the shell (sidebar), pills, supplier table, payment list, and the trip and supplier forms. The forms include paste-an-email mode, with AI honestly marked as not connected.
-  - Routes: `/dashboard` (redirects to the first trip), `/trips`, `/trips/[id]` (tabs Overview / Suppliers / Itinerary / Documents / Deadlines), `/suppliers` (directory with reuse), `/deadlines`, `/documents`, `/notes`.
-  - Supplier shape: `{id, name, place, category, status, contact, notes, img?, photo?, deposit:{amount,due,paid}|null, balance:{...}|null}`. Stats, overdue and the next payment are computed.
-  - Optional supplier photo (added 2026-10-28): click, drag or paste an image, and it's cropped to a 160px JPEG data URL (~12 KB) in `photo`. Without one, the initials tile shows. `img` is only for bundled sample images. Directory reuse copies the photo. If `localStorage` is full, a banner warns. **Stage 2:** move photos to Supabase Storage and keep a URL in place of the data URL.
-- Supplier reuse inside a trip (approved 2026-10-28): "Add supplier" has three tabs, Enter manually / Your suppliers / Paste an email. "Your suppliers" is a searchable picker built from `supplierDirectory(trips)` in `ui.js`; suppliers already on the trip are disabled. Typing two or more letters of a name shows "From your suppliers" chips. Reuse copies `contactDetails()` only. Sample thumbnails are loaded through `sampleImage()` in `app/components/images.js` with a `?v=` version tag; bump `SAMPLE_IMAGE_VERSION` when sample photos change. Landing photos have descriptive unique filenames.
-- The trip Overview shows a Money panel (`MoneySummary`). The trip header has "Import" (`ImportDialog` in `import.js`, which adds suppliers through the store's `addSuppliers`). Browser click-test scripts (flow, reuse, photo, waitlist, import: 85 checks) live in the session scratchpad, not the repo. Worth moving into the repo as real tests once git is set up.
-- Covered steps: 1 (create trip), 2 (manual add; paste-email keeps the text as notes), 3 (status and notes), 5 (dashboard), 6 (deadlines and mark paid, no emails), 7 (edit trip and supplier), 8 (directory reuse copies contact details only).
-- Not yet covered: step 4's real AI review screen with source highlighting, the Today view, a "next action" column, reminders, and the itinerary and documents tabs (honest placeholders).
-- `public/images/`: real Unsplash photos (2026-10-28), replacing the earlier crops from the mockup. Sources are in `IMAGE-CREDITS.md`.
-- **Git:** pushed to GitHub at `ChisomUma/roveboard` (branch `main`, remote over SSH host alias `github-second`) on 2026-10-28. It was **public** at first; recommend private, because `.claude/` holds strategy docs. Commit or push only when the founder asks.
-- (Superseded 2026-11-09) Automated tests now live in the repo: 17 Playwright tests in `tests/` run on GitHub for every push and PR (see "Engineering conventions" in SKILL.md).
+## What exists today (2026-11-09; update as it changes)
 
-## Stage 1: interactive prototype (now)
-Goal: a clickable, realistic product that operators can try in a 20-minute call. It uses sample data, needs no accounts and is free to host.
+**Public site:** landing page (`app/Landing.js`), pricing (`app/pricing/`, 20-day trial, yearly first; billing paused), privacy and terms (company placeholders in `app/site.js`), "Get product updates" list (`waitlist` table).
 
-Milestones:
-1. **Foundation**: `git init`; split `app/page.js` into routes and components (`/app/trips`, `/app/trips/[id]`, `/app/suppliers`, `/app/deadlines`, `/app/today`); one client-side store with the PRD data model; seed with the Sunshine Travel example.
-2. **App shell to match the design**: navy sidebar (Trips, Suppliers, Documents, Deadlines, Notes), trip header, tabs, stat cards and the supplier table with status pills from the landing preview.
-3. **Steps 1–2 and 8**: create trip, add supplier manually, pick from the directory (reuse).
-4. **Steps 2 and 4 (AI, simulated)**: paste email → review screen with suggested fields, edit, highlighted source text and "Add supplier". In stage 1 the extraction can be a deterministic demo parser for the sample emails, clearly labelled as a demo.
-5. **Steps 5–6**: computed "next action", Deadlines view, Today view, mark as paid, reminder preview (no emails sent).
-6. **Step 7**: edit the trip and booking; paste a revised confirmation and see the suggested diff ("10 → 12 rooms").
-7. **Waitlist that works**: a real form (Tally, or a simple Supabase table) with a qualifying question. See gtm-playbook.md.
-8. Deploy to Vercel with a shareable demo link.
+**Accounts:** email + password with a two-step sign-up (business questions saved on `organizations`), recovery for half-finished sign-ups, onboarding page. The Google button appears once the provider is configured (not yet). "Confirm email" is off. No "forgot password" yet.
 
-Exit criteria: 5 or more operators have clicked through it on a call, and the top confusions are fixed.
+**Workspace (`app/(workspace)/`), live on Supabase with row-level security:**
+- Trips: create, edit, delete (⋯ menu), cover photos, Trips list as home.
+- Suppliers on a trip: add manually or reuse from "Your suppliers", photo, category, location, contact, confirmation status, notes, deposit and final balance (amount, due date, paid).
+- Money summary per trip; Deadlines per trip and across all trips, with "Mark paid".
+- Spreadsheet import (CSV or paste) and CSV export (round trip tested).
+- Supplier directory (`/suppliers`): **derived from trip suppliers by name**, not a real company-wide record yet (see Phase 1).
+- Team notes; Itinerary and Documents tabs are honest "coming soon" placeholders.
+- Phone-friendly: bottom tab bar, account menu, stacked tables, bottom-sheet dialogs.
 
-## Stage 2 progress (2026-11-08)
-- **Database:** `supabase/migrations/20261108000100_initial_schema.sql` (organizations, memberships, trips, suppliers, waitlist), with RLS via `is_member(org)` and `create_organization()` (one workspace per user). Auto-expose of new tables is off, so grants are explicit. Verified from outside: anonymous users can read nothing and can only insert into the waitlist.
-- **Auth:** `@supabase/ssr` with `app/lib/supabase/{client,server}.js`. `proxy.js` (Next 16's renamed middleware) refreshes sessions via `getClaims()` on workspace and auth routes. `app/lib/session.js` has `getWorkspaceSession()` (demo/live, user, org) and `getAuthSettings()` (is Google enabled?). Pages: `app/(auth)/login` (email+password, Google), `app/(auth)/onboarding` ("Name your company"), and `app/auth/callback/route.js` (OAuth code exchange, same-site redirects only).
-- **Store:** `store.js` has `DemoStoreProvider` (localStorage) and `LiveStoreProvider` (Supabase; optimistic updates, reload on failure), chosen by the server layout. Ids are `crypto.randomUUID()`.
-- **Waitlist:** now inserts into the Supabase `waitlist` table (works on Vercel).
-- **Tested** (2026-11-08) against the real project: demo regressions, full live journey, and cross-company isolation attacks through the API (46 checks). Test scripts live in the session scratchpad, not the repo.
-- **Next:** Google provider setup (Google Cloud OAuth client, plus Supabase Site URL and redirect URLs), Supabase Storage for documents and photos, then Resend SMTP and turning "Confirm email" back on, then reminders, then AI.
+**Engineering:** migrations in `supabase/migrations/` (paused billing in `supabase/paused/`), 19 Playwright tests (`tests/`) on every push, Dependabot. Repo `ChisomUma/roveboard` (recommend private).
 
-## Stage 2: private pilot (2–3 design-partner companies)
-1. Supabase Auth with organization workspaces and row-level security (database rules so one company can't see another's data).
-2. Move the data model to Postgres (tables from prd.md).
-3. Real AI extraction: pasted text first, then PDFs via Supabase Storage. Return structured JSON with a source span for each field and never auto-save.
-4. Resend reminder emails from a scheduled job (deadline minus N days, configurable).
-5. Basic activity log, CSV export (so customers know they can leave) and error monitoring.
-6. Trust basics: privacy policy, terms, data-processing notes (supplier contracts go to an AI provider, so disclose this, and review the provider's data-retention terms), backups.
+**Not built yet:** reminders, AI extraction, document and contract uploads, Today view, team members, billing (paused), forgot password, per-supplier currency.
 
-Exit criteria: the pilot companies run at least one live trip end to end in Roveboard, and at least one says they'd pay.
+## Product roadmap
 
-## Stage 3: paid launch (after the pilot)
-Billing (Stripe subscriptions), onboarding (importing an existing spreadsheet), team invites, and the "later" features the pilot data justifies.
+**Direction:** start as the simplest supplier tracker for small group operators. Grow, phase by phase, into **the supplier operations platform for travel companies**: one place for supplier relationships, trip commitments, confirmations, payments, contracts and supplier risk. Each phase is driven by real customer demand (the trigger), not by a calendar. The early phases serve the beachhead (small tour operators and DMCs); the enterprise features come only when enterprise buyers are ready to pay.
+
+Features marked **(A)** came from the founder's external advisory review (2026-11-09), adapted to Roveboard's stage and principles. Never show a feature on the website before it's built.
+
+### Phase 0: finish v1 (now → the first 20 sign-ups and public launch)
+The core loop for small operators, plus the gaps that block launch.
+- Forgot password / reset (needs custom email via Resend for volume)
+- Deadline reminder emails (Resend + a scheduled job; needs the domain)
+- Today view: what needs attention across all trips (from the PRD)
+- Document uploads on a supplier (Supabase Storage): confirmations, invoices, contracts as files
+- AI suggestions from **pasted** supplier emails, with a review screen and the source shown for each value (never auto-save)
+- Google sign-in setup; legal placeholders filled; billing (Paddle) once the company and domain exist
+- **Trigger to move on:** launched, 10+ activated companies, first paying customers
+
+### Phase 1: supplier foundation (first paying customers, still small operators)
+Makes suppliers first-class, company-wide records. This is the foundation for almost every later feature, so do it **before** customers build up a lot of data.
+- **Company-wide supplier profiles (A, Feature 1).** A supplier is created once and reused on every trip. Profile fields: name, category, country, location, contact people (name, role, email, phone), status (active / inactive), default payment terms (e.g. "30% deposit, balance 30 days before arrival"), default currency, notes, photo, and linked trips. Engineering: a new `supplier_profiles` table (org-level) and `suppliers` rows become **bookings** linked by `profile_id` (matches the PRD data model); backfill by grouping existing rows by name per company; the directory and "Your suppliers" picker read from profiles.
+- **Multi-trip supplier view (A, Feature 6).** In the directory: active trips, pending confirmations and amount outstanding per supplier; open a supplier to see every trip that depends on it ("if this hotel lets us down, which departures are hit?").
+- **Contracts, lite (A, Feature 2).** Upload agreements to a supplier profile with start date, expiry date, payment terms and cancellation terms; reminders before expiry (e.g. 60 days); link a contract to the trips it covers.
+- **AI from PDFs + discrepancy checks (A, Feature 5).** Extend AI suggestions to uploaded confirmations, contracts and invoices, and compare them with what's already recorded: a different total (€4,800 vs €4,500), a changed payment deadline, dates that don't match the trip, a different traveller or room count. Discrepancies are flagged for a person to review; financial records are never changed silently.
+- **Per-supplier currency** (deferred decision from 2026-11-08): bookings in EUR, GBP, USD and more within one trip, with totals per currency.
+- **Team members, basic (A, Feature 8 part 1).** Invite colleagues into the company workspace (owner / member), plus an **activity history** showing who changed what and when on each trip and supplier.
+- **Trigger to move on:** customers with several coordinators per company, or asking for roles, approvals or reporting
+
+### Phase 2: teams and growing operators (10–50 staff, DMCs with several destinations)
+- **Roles and permissions (A, Feature 8).** Administrator, operations (trips and confirmations), finance (payments and deadlines; read-only elsewhere), regional manager (assigned destinations), read-only. Comments on suppliers and trips, task assignments, notifications.
+- **Bank-detail protection (A, Feature 5 + 8).** Supplier bank details stored once on the profile; any change is flagged ("this invoice has a different bank account from the verified one"), logged and needs a second person's approval. Payment-diversion fraud is common in travel, so this is valuable at any size. Security review required before storing bank details.
+- **Supplier operations dashboard (A, section 3).** A company-wide home for managers: suppliers, active trips, pending confirmations, payments due, contracts expiring, and a "Requires attention" list. Small companies keep the Today view; this is its manager-level version.
+- **Supplier performance scorecards (A, Feature 4).** Start with metrics Roveboard already has data for: confirmation reliability (confirmed by the needed date), cancellation rate, payment record, documents complete. Add post-trip team feedback (1–5 plus a comment) and incident reports. Show trends per supplier and compare suppliers in the same destination and category. Label scores clearly as based on the company's own records.
+- **Contracts, full (A, Feature 2).** Version history, compare current and previous terms, renewal workflow, SLAs, insurance certificates, rate agreements.
+- **Budget vs actual (A, section 4).** Expected supplier costs per trip compared with confirmed and paid amounts.
+- **Reports and integrations.** Advanced exports (supplier spend, payments, performance); accounting sync with Xero or QuickBooks (integrate, don't build).
+- **Trigger to move on:** responsible-travel operators asking for compliance tracking, or larger companies requesting enterprise controls
+
+### Phase 3: responsible travel and supplier risk (an add-on module for a specific segment)
+Many tour operators (for example AITO members and B Corp operators) have responsible-travel policies and supplier codes of conduct. A focused module could become a strong differentiator and possibly a paid add-on. Validate demand in interviews before building.
+- **Supplier compliance management (A, Feature 3).** Requirement types per company (business registration, insurance with expiry, health and safety assessment, human rights, child protection and safeguarding, environmental practices, signed supplier code of conduct). Each supplier gets a status of **Compliant / Requires review / Non-compliant**, with evidence uploads, expiry reminders, exceptions and corrective actions, and a full audit trail. A real workflow, not just a folder of PDFs.
+- **Diversity and sustainability tracking (A, Feature 7).** Supplier attributes (locally owned, women-owned, Indigenous-owned, minority-owned, local employment, environmental certifications) and reports: share of spend with locally owned suppliers, spend with women-owned businesses, certified suppliers by country.
+- **Supplier concentration risk (A, section 4).** Flag heavy dependence on one supplier or group in a destination or category (e.g. "70% of accommodation nights in Marrakech are with one hotel group").
+- **Partner, don't rebuild assessments:** sustainability assessment providers such as Travelife already run supplier assessments. Integrate with them or import their results rather than building assessment content (per "integrate, don't build").
+- **Trigger to move on:** 2 or more enterprise prospects ready to commit budget, with their requirements written down
+
+### Phase 4: enterprise (only with signed enterprise demand)
+For companies like Intrepid (thousands of suppliers, many regions). Enterprise sales cycles are long (often 6–12 months) and come with security questionnaires, contracts and support expectations. Only start when a prospect is ready to pay for it, ideally as a design partner.
+- **Single sign-on** (SAML/OIDC via the company's identity system), SCIM user provisioning
+- **Multi-country / multi-region operations** with separate teams and data views per destination
+- **Purchase approvals** before committing to large supplier spend
+- **Supplier portal (optional for suppliers)** where suppliers submit documents and update their own details. Suppliers must never *need* an account to work with a Roveboard customer.
+- **Public API and webhooks** to connect booking, finance and procurement systems (see the tooling radar)
+- Enterprise trust work: security documentation, a data processing agreement, data residency options, audit logs export, and potentially SOC 2 or ISO 27001
+- Enterprise pricing tier with onboarding and support commitments
+
+### How phases map to pricing (revisit when each phase ships)
+- Starter / Growth / Business (today's plans): Phases 0–1
+- Business and above: Phase 2 team features
+- Add-on or a higher tier: Phase 3 responsible-travel module
+- Enterprise (custom): Phase 4
+
+## Competitors and partners to research before positioning (from the advisory review)
+- **TripMatrix:** supplier directories, contracts, pricing, integrations. Check its current features, target customers and prices.
+- **Travelife:** supplier sustainability assessments for travel companies. More likely a partner than a competitor for Phase 3.
+- The others from the GTM playbook: Tourplan, Tourwriter, Lemax, TourCMS, Rezdy, Travefy.
+Verify every claim from the review (e.g. Intrepid's supplier numbers and policies) against the original source before using it in sales or marketing material.
 
 ## Engineering habits
 - Commit small, with clear messages; work on a branch per milestone.
-- `npm run build` must pass. Check desktop and phone widths before calling a screen done.
+- `npm run build` and the Playwright tests must pass; every feature adds or updates a test. Check phone (390px), tablet and desktop widths before calling a screen done.
+- Every new table: RLS policies **and** explicit grants, in a new migration file.
 - Keep sample data realistic: it's what prospects see in demos.
 - Record decisions in `decisions.md`.
+
+## History
+- **Stage 1 (Oct 2026):** clickable prototype with sample data and a browser-only demo store; deployed to Vercel.
+- **Stage 2 (Nov 2026):** Supabase accounts and database with row-level security, live store, two-step sign-up, pricing page, CSV import and export, automated tests in GitHub Actions, phone-friendly layout. The public demo and sample trips were removed by founder decision (see decisions.md).

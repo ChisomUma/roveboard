@@ -62,6 +62,7 @@ The goal: **less time searching for details, and fewer things forgotten.**
 - Email reminders for upcoming deadlines
 
 ### Later (don't build until v1 is validated)
+The phased plan (Phases 1–4, each with a trigger) is in `build-roadmap.md`. It adds company-wide supplier profiles, contracts, AI discrepancy checks, roles and approvals, scorecards, a responsible-travel compliance module and enterprise features. The items below are also placed there.
 - Connected inboxes (Gmail/Outlook) that find supplier emails for review
 - Automatic matching of incoming documents to a trip and supplier
 - Automatic change detection between document versions
@@ -84,6 +85,7 @@ Finding or guaranteeing suppliers, automatic booking, processing or holding paym
 - **Document**: org, trip or booking, source type (pasted text / PDF / contract / invoice), storage path or text.
 - **Suggestion**: document, target (a new booking or an existing booking), proposed fields with source spans, status (pending / accepted / rejected), reviewed_by.
 - **Activity log**: who changed what and when. It supports "what changed" and later team features.
+- **Later phases (see build-roadmap.md):** Contact (people at a supplier), Contract (supplier, dates, terms, versions, linked trips), ComplianceRecord (requirement, status, evidence, expiry, actions), Feedback / Incident (per booking), BankDetails (verified, change approvals), Role and permission sets.
 
 "Next action" and "overdue" are **computed** from payments, tasks and status, never stored by hand.
 

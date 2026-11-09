@@ -50,7 +50,7 @@ For **small group tour operators and DMCs** who **coordinate suppliers across em
 ## Competitor framing
 
 - **The real competitor is the spreadsheet plus the inbox.** Position against the status quo first: "your spreadsheet can't tell you what's due this week".
-- **Full tour-operator systems** (examples to research before comparing: Tourplan, Tourwriter, Lemax, TourCMS, Rezdy, Travefy). Frame them as powerful but heavy: long setup, built for itineraries and bookings. Roveboard is the lightweight supplier layer. Some of them may be future integration partners (see "integrate, don't build" in `decisions.md`), so never disparage them.
+- **Full tour-operator systems** (examples to research before comparing: Tourplan, Tourwriter, Lemax, TourCMS, Rezdy, Travefy). Also research **TripMatrix** (supplier directories, contracts, pricing, integrations) and **Travelife** (supplier sustainability assessments; a likely partner for the Phase 3 responsible-travel module). Frame them as powerful but heavy: long setup, built for itineraries and bookings. Roveboard is the lightweight supplier layer. Some of them may be future integration partners (see "integrate, don't build" in `decisions.md`), so never disparage them.
 - **Comparison claims must be verified and dated.** Check the competitor's current site and pricing, link the source, write "as of <month year>", and re-check every 6 months. Be fair: state what they do better. Fair comparisons get trusted, and they get cited by AI assistants.
 
 ## Words
