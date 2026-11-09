@@ -310,3 +310,4 @@
   .lp-nav .lp-login:first-child{display:none}
   .pr-toggle button{padding:10px 14px}
 }
+@media (max-width:640px){.lp-updates .lp-wl input{font-size:16px}}

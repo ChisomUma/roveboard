@@ -36,8 +36,8 @@ For **small group tour operators and DMCs** who **coordinate suppliers across em
 > Roveboard helps tour operators and DMCs track every supplier on a trip: what's confirmed, what's owed and when it's due.
 
 **Short boilerplate (about 50 words):**
-> Roveboard is supplier tracking for group trips. Tour operators, DMCs and travel agencies use it to see, for every trip, which hotels, coaches and guides are confirmed, which deposits and balances are owed, and what's due next. It imports your existing spreadsheet, and you can export everything any time. Built in the UK.
-(Update "Built in the UK" to match the registered company's location.)
+> Roveboard is supplier tracking for group trips. Tour operators, DMCs and travel agencies use it to see, for every trip, which hotels, coaches and guides are confirmed, which deposits and balances are owed, and what's due next. It imports your existing spreadsheet, and you can export everything any time.
+(Once registered, add "Roveboard Ltd is registered in England and Wales." Don't say "built in the UK": the founder works from Nigeria, and claims must be true.)
 
 ## Message pillars (with proof)
 

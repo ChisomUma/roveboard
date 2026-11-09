@@ -264,6 +264,17 @@ export function Shell({ children }) {
   const path = usePathname();
   const { ready, session, saveError, clearSaveError, toasts } = useStore();
   const active = href => path.startsWith(href) || (href === '/trips' && path === '/dashboard');
+  // On phones the company/account details sit behind a button in the top bar.
+  const [accountOpen, setAccountOpen] = useState(false);
+  const sideRef = useRef(null);
+  useEffect(() => setAccountOpen(false), [path]);
+  useEffect(() => {
+    if (!accountOpen) return;
+    const close = e => { if (e.type === 'keydown' ? e.key === 'Escape' : !sideRef.current?.contains(e.target)) setAccountOpen(false); };
+    document.addEventListener('mousedown', close);
+    document.addEventListener('keydown', close);
+    return () => { document.removeEventListener('mousedown', close); document.removeEventListener('keydown', close); };
+  }, [accountOpen]);
 
   async function logOut() {
     await createClient().auth.signOut();
@@ -272,15 +283,18 @@ export function Shell({ children }) {
 
   return (
     <div className="ws">
-      <aside className="ws-side">
+      <aside className={'ws-side' + (accountOpen ? ' is-open' : '')} ref={sideRef}>
         <Link href="/" className="ws-brand" aria-label="Roveboard home"><Logo /></Link>
-        <nav>
+        <nav aria-label="Workspace">
           {nav.map(([href, icon, label]) => (
-            <Link key={href} href={href} className={active(href) ? 'on' : ''} aria-label={label}>
+            <Link key={href} href={href} className={active(href) ? 'on' : ''} aria-current={active(href) ? 'page' : undefined}>
               <Icon name={icon} size={20} /><span>{label}</span>
             </Link>
           ))}
         </nav>
+        <button type="button" className="ws-account-btn" aria-label="Account" aria-expanded={accountOpen} onClick={() => setAccountOpen(o => !o)}>
+          {session.org.name.trim().charAt(0).toUpperCase() || '?'}
+        </button>
         <div className="ws-side-foot">
           <b>{session.org.name}</b>
           <span className="ws-side-email">{session.user.email}</span>
@@ -324,7 +338,7 @@ function TrialBanner({ billing }) {
 
 export function SupplierTable({ suppliers, onEdit }) {
   return (
-    <div className="ws-table">
+    <div className="ws-table ws-stack">
       <table>
         <thead>
           <tr><th>Supplier</th><th>Category</th><th>Confirmation</th><th>Deposit</th><th>Final balance</th></tr>
@@ -333,10 +347,10 @@ export function SupplierTable({ suppliers, onEdit }) {
           {suppliers.map(s => (
             <tr key={s.id} className="is-click" tabIndex={0} onClick={() => onEdit(s)} onKeyDown={e => e.key === 'Enter' && onEdit(s)}>
               <td><SupplierName s={s} /></td>
-              <td><Category name={s.category} /></td>
-              <td><StatusPill status={s.status} /></td>
-              <td><DepositPill p={s.deposit} /></td>
-              <td><BalancePill p={s.balance} /></td>
+              <td data-label="Category"><Category name={s.category} /></td>
+              <td data-label="Confirmation"><StatusPill status={s.status} /></td>
+              <td data-label="Deposit"><DepositPill p={s.deposit} /></td>
+              <td data-label="Final balance"><BalancePill p={s.balance} /></td>
             </tr>
           ))}
         </tbody>
@@ -347,7 +361,7 @@ export function SupplierTable({ suppliers, onEdit }) {
 
 export function SupplierContacts({ suppliers, onEdit }) {
   return (
-    <div className="ws-table">
+    <div className="ws-table ws-stack">
       <table>
         <thead>
           <tr><th>Supplier</th><th>Contact</th><th>Confirmation</th><th>Notes</th><th /></tr>
@@ -356,10 +370,10 @@ export function SupplierContacts({ suppliers, onEdit }) {
           {suppliers.map(s => (
             <tr key={s.id}>
               <td><SupplierName s={s} sub={`${s.category} · ${s.place || '—'}`} /></td>
-              <td>{s.contact || <span className="ws-dash">—</span>}</td>
-              <td><StatusPill status={s.status} /></td>
-              <td className="ws-notes"><span>{s.notes || '—'}</span></td>
-              <td><button className="ws-btn small" onClick={() => onEdit(s)}>Edit</button></td>
+              <td data-label="Contact">{s.contact || <span className="ws-dash">—</span>}</td>
+              <td data-label="Confirmation"><StatusPill status={s.status} /></td>
+              <td data-label="Notes" className="ws-notes"><span>{s.notes || '—'}</span></td>
+              <td className="ws-row-action"><button className="ws-btn small" onClick={() => onEdit(s)}>Edit</button></td>
             </tr>
           ))}
         </tbody>

@@ -6,6 +6,8 @@ import { StoreProvider } from './store';
 import { Shell } from './ui';
 
 export const metadata = { title: 'Workspace · Roveboard' };
+// Phones: colour the browser bar like the app's top bar, and let the bottom tab bar sit above the home indicator.
+export const viewport = { themeColor: '#12294a', viewportFit: 'cover' };
 
 // The workspace is for signed-in users only. New users name their company first.
 export default async function WorkspaceLayout({ children }) {

@@ -7,7 +7,7 @@ Full marketing (publishing, outbound, launch) starts when the **gates** below ar
 | Gate | Why it matters for marketing | Status |
 |---|---|---|
 | **Most v1 features built** (see the `roveboard` roadmap; at minimum reminders, plus the AI suggestion feature if it's in the launch promise) | Marketing makes promises the product has to keep; trial users churn if the core loop is missing | In progress |
-| **Company registered** (e.g. Companies House, UK) | Contracts, invoices, a business bank account, payment provider verification (Paddle), credibility in outbound | Not yet |
+| **Company registered** (UK Ltd via Companies House as a non-resident director; see decisions.md 2026-11-09) | Contracts, invoices, a business bank account, payment provider verification (Paddle), credibility in outbound | Not yet |
 | **Domain bought, with business email** (e.g. roveboard.co / .com / .io) | SEO authority builds on *your* domain (not vercel.app); outbound needs a proper sender; AI assistants and buyers trust a real domain | Not yet |
 | **Business LinkedIn page + polished founder profile** | Main channel for B2B travel; the page is where people check you're real | Not yet |
 | **Billing live** (Paddle; currently paused) | Inbound needs a path to pay; otherwise sign-ups pile up as free users | Paused |
@@ -33,6 +33,7 @@ These cost little or nothing and get more valuable the earlier they start. Recom
 - [ ] Email authentication: SPF, DKIM and DMARC records (start DMARC at `p=none` with reports, tighten to `quarantine` after a few weeks of clean reports)
 - [ ] If doing outbound: a **separate sending domain** (e.g. `tryroveboard.com` or `getroveboard.com`) that redirects to the main site, so cold-email reputation never touches the main domain (see `outbound.md`)
 - [ ] Update `app/site.js` (legal name, contact email, country), privacy policy and terms with the company's details
+- [ ] Business bank account that accepts a Nigeria-based director of a UK Ltd (e.g. Wise Business; check eligibility). Tide/Starling/Monzo usually require UK-resident directors
 - [ ] UK: pay the ICO data protection fee if required (most businesses handling customer personal data must; it's small, so check current tiers at ico.org.uk)
 
 **Measurement**

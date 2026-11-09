@@ -14,17 +14,17 @@ export default function SuppliersPage() {
       <PageHead title="Supplier directory" sub={<p className="ws-sub">Every supplier you’ve worked with. Reuse one on another trip without retyping their details.</p>} />
       <div className="ws-body">
         {list.length ? (
-          <div className="ws-table">
+          <div className="ws-table ws-stack">
             <table>
               <thead><tr><th>Supplier</th><th>Category</th><th>Contact</th><th>Used in</th><th /></tr></thead>
               <tbody>
                 {list.map(({ s, trips: used }) => (
                   <tr key={s.name}>
                     <td><SupplierName s={s} /></td>
-                    <td><Category name={s.category} /></td>
-                    <td>{s.contact || <span className="ws-dash">—</span>}</td>
-                    <td className="ws-used">{used.map(t => <Link key={t.id} href={`/trips/${t.id}`}>{t.name}</Link>)}</td>
-                    <td><button className="ws-btn small" disabled={!trips.length} onClick={() => setReusing(contactDetails(s))}>Add to trip</button></td>
+                    <td data-label="Category"><Category name={s.category} /></td>
+                    <td data-label="Contact">{s.contact || <span className="ws-dash">—</span>}</td>
+                    <td data-label="Used in" className="ws-used">{used.map(t => <Link key={t.id} href={`/trips/${t.id}`}>{t.name}</Link>)}</td>
+                    <td className="ws-row-action"><button className="ws-btn small" disabled={!trips.length} onClick={() => setReusing(contactDetails(s))}>Add to trip</button></td>
                   </tr>
                 ))}
               </tbody>

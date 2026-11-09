@@ -273,41 +273,107 @@
 @media (max-width:1100px){
   .ws-stats{grid-template-columns:repeat(2,1fr);gap:16px}
 }
+.ws-account-btn{display:none}
+@media (hover:none){.ws-card:hover{transform:none}}
+
+/* Phones and small tablets: top bar (logo + account), bottom tab bar, stacked tables, bottom-sheet dialogs */
 @media (max-width:860px){
   .ws{flex-direction:column}
-  .ws-side{position:sticky;z-index:20;height:auto;width:auto;flex-direction:row;align-items:center;gap:6px;padding:10px 12px;overflow-x:auto}
-  .ws-brand{margin:0 auto 0 0;padding:0 4px;font-size:17px}
-  .ws-side nav{display:flex;gap:2px}
-  .ws-side nav a{padding:10px}
-  .ws-side nav a span,.ws-side-foot{display:none}
-  .ws-head{padding:20px 16px 0}
-  .ws-head-row{flex-direction:column;padding-bottom:20px}
+  .ws-side{position:sticky;top:0;z-index:40;height:auto;width:auto;flex-direction:row;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;padding-top:calc(10px + env(safe-area-inset-top))}
+  .ws-brand{margin:0;padding:0;font-size:18px}
+  .ws-account-btn{display:grid;place-items:center;width:38px;height:38px;flex:none;padding:0;border:1px solid #2f4f78;border-radius:50%;background:#1d3a5f;color:#fff;font-size:15px;font-weight:700}
+  .ws-side.is-open .ws-account-btn{border-color:var(--cyan);background:#24476f}
+  .ws-side-foot{display:none;position:absolute;top:calc(100% + 8px);right:12px;width:min(300px,calc(100vw - 24px));margin:0;padding:16px 18px 10px;border-radius:14px;background:#fff;color:var(--soft);font-size:14px;line-height:1.5;box-shadow:0 18px 44px #0b23423d}
+  .ws-side.is-open .ws-side-foot{display:grid}
+  .ws-side-foot b{color:var(--navy);font-size:15.5px}
+  .ws-side-foot button{width:100%;margin-top:12px;padding:12px 0 8px;border-top:1px solid var(--line);color:var(--ink);font-size:15px;font-weight:600;text-align:left;text-decoration:none}
+  .ws-side-foot a{padding:8px 0;color:#0f8fb0;font-size:14.5px}
+  .ws-side nav{position:fixed;left:0;right:0;bottom:0;z-index:40;display:grid;grid-template-columns:repeat(5,1fr);gap:0;padding:6px 4px calc(6px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#fff;box-shadow:0 -4px 18px #0b23420f}
+  .ws-side nav a{flex-direction:column;justify-content:center;gap:3px;min-height:52px;padding:6px 2px;border-radius:10px;color:var(--soft);font-size:11px;font-weight:600;line-height:1.2}
+  .ws-side nav a:hover{background:none}
+  .ws-side nav a.on{background:none;color:var(--navy)}
+  .ws-side nav a.on svg{color:#14b3d6}
+  .ws-main{padding-bottom:calc(66px + env(safe-area-inset-bottom))}
+  .ws-trial,.ws-banner{padding-left:16px;padding-right:16px}
+
+  .ws-head{padding:18px 16px 0}
+  .ws-head-row{flex-direction:column;gap:16px;padding-bottom:18px}
   .ws-head h1{font-size:26px}
-  .ws-tabs{margin-top:16px}
-  .ws-tabs button{padding:12px 14px 14px;font-size:15px}
-  .ws-body{padding:20px 16px 40px}
+  .ws-meta{flex-wrap:wrap;gap:6px 12px;font-size:14px}
+  .ws-head-actions{width:100%;gap:8px}
+  .ws-head-actions .ws-btn.ghost{background:#f2f5f9;color:var(--ink)}
+  .ws-tabs{margin:14px -16px 0;padding:0 6px}
+  .ws-tabs button{padding:12px 12px 14px;font-size:14.5px}
+  .ws-body{padding:16px 16px 28px}
+  .ws-section-title{margin:28px 0 12px;font-size:19px}
+
   .ws-stats{gap:12px}
   .ws-stat{gap:12px;padding:14px}
   .ws-stat i{width:40px;height:40px}
   .ws-stat b{font-size:20px}
   .ws-stat small{font-size:13px}
-  .ws-cards{grid-template-columns:1fr}
+  .ws-money{padding:18px}
+  .ws-money-grid{grid-template-columns:1fr 1fr}
+  .ws-money-grid dd{font-size:19px}
+
+  .ws-cards{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+  .ws-card{padding:18px}
+  .ws-card-cover{width:calc(100% + 36px);height:130px;margin:0 -18px 16px}
+  .ws-card-menu{top:10px;right:10px}
+  .ws-card-menu-btn{width:40px;height:40px}
+  .ws-card-foot{flex-wrap:wrap;justify-content:flex-start;gap:4px 14px}
+
   .ws-pay{grid-template-columns:60px 1fr auto;gap:8px 14px;padding:14px 16px}
   .ws-pay-who{grid-column:2/-1}
   .ws-pay-amount{grid-column:2;text-align:left}
   .ws-pay>.ws-pill{grid-column:2;grid-row:3}
   .ws-pay>.ws-btn{grid-column:3;grid-row:2/4;align-self:center}
   .ws-pay-date{grid-row:1/4;align-self:start}
-  .ws-dialog{padding:20px}
+  .ws-btn.small{padding:10px 14px}
+
+  /* Tables become one card per row, each value labelled */
+  .ws-stack{overflow:visible;border-radius:0;background:none;box-shadow:none}
+  .ws-stack table,.ws-stack tbody,.ws-stack tr,.ws-stack td{display:block;width:auto;min-width:0}
+  .ws-stack thead{display:none}
+  .ws-stack tbody{display:grid;gap:12px}
+  .ws-stack tr{padding:4px 16px;border-radius:12px;background:#fff;box-shadow:0 1px 3px #0b23420d}
+  .ws-stack td{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:46px;padding:8px 0;white-space:normal;text-align:right;overflow-wrap:anywhere}
+  .ws-stack tr td,.ws-stack tr:last-child td{border-bottom:1px solid #eef2f6}
+  .ws-stack tr td:last-child{border-bottom:0}
+  .ws-stack td:first-child{min-width:0;padding:12px 0;text-align:left}
+  .ws-stack td[data-label]::before{content:attr(data-label);flex:none;color:var(--soft);font-size:13.5px;text-align:left}
+  .ws-stack .ws-thumb,.ws-stack .ws-avatar{width:46px;height:46px}
+  .ws-stack .ws-notes{display:block;max-width:none;padding:10px 0;text-align:left}
+  .ws-stack .ws-notes::before{display:block;margin-bottom:4px}
+  .ws-stack .ws-used{min-width:0}
+  .ws-stack .ws-used a{white-space:normal}
+  .ws-stack .ws-row-action{padding:10px 0 12px}
+  .ws-stack .ws-row-action .ws-btn{width:100%;justify-content:center}
+
+  .ws-dialog-head h2{font-size:20px}
   .ws-form{grid-template-columns:1fr}
-  .ws-money-grid{grid-template-columns:1fr 1fr}
-  .ws-toasts{left:16px;right:16px;bottom:16px;justify-items:stretch}
+  .ws-form fieldset{grid-template-columns:1fr 1fr}
+  .ws-form .ws-check{grid-column:1/-1;padding-bottom:0}
+  .ws-form-actions .ws-btn-left{margin-right:0}
   .ws-segment button{gap:5px;padding:9px 4px;font-size:13px}
   .ws-segment svg{display:none}
   .ws-doc{flex-wrap:wrap}
-  .ws-money-grid dd{font-size:19px}
-  .ws-form-actions .ws-btn-left{margin-right:0}
-  .ws-form fieldset{grid-template-columns:1fr 1fr}
-  .ws-form .ws-check{grid-column:1/-1;padding-bottom:0}
-  .ws-form-actions{flex-wrap:wrap}
+  /* 16px text stops iPhones zooming into a field when it's tapped */
+  .ws-form input:not([type=checkbox]),.ws-form select,.ws-form textarea,.ws-map select{font-size:16px}
+
+  .ws-toasts{left:16px;right:16px;bottom:calc(74px + env(safe-area-inset-bottom));justify-items:stretch}
+  .ws-toast:not(:last-child){display:none}
+}
+
+/* Phones: full-width header buttons, bottom-sheet dialogs with the action buttons always in reach */
+@media (max-width:600px){
+  .ws-head-actions .ws-btn{flex:1 1 auto;justify-content:center;padding:11px 14px}
+  .ws-overlay{align-items:flex-end;padding:24px 0 0}
+  .ws-dialog,.ws-dialog.is-wide{width:100%;max-height:calc(100dvh - 24px);overflow:auto;overscroll-behavior:contain;padding:20px 16px 16px;border-radius:18px 18px 0 0}
+  .ws-form-actions{position:sticky;bottom:-16px;z-index:3;flex-wrap:wrap;margin:6px -16px -16px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#fff}
+  .ws-form-actions .ws-btn{flex:1 1 auto;justify-content:center}
+}
+@media (max-width:380px){
+  .ws-segment button{padding:8px 2px;font-size:12px;line-height:1.2;white-space:normal}
+  .ws-side nav a{font-size:10px}
 }
